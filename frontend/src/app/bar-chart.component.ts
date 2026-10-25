@@ -20,9 +20,12 @@ import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
     </div>
   `,
   styles: [`
-    .chart-wrapper { width: 100%; max-width: 100%; overflow-x: auto; }
-    .chart-svg { width: 100%; height: auto; min-height: 120px; }
+    .chart-wrapper { width: 100%; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .chart-svg { width: 100%; height: auto; min-height: 100px; max-width: 100%; }
     .no-data { color: #6b7280; font-style: italic; font-size: 14px; }
+    @media (max-width: 480px) {
+      .chart-svg { min-height: 80px; }
+    }
   `]
 })
 export class BarChartComponent implements OnChanges {

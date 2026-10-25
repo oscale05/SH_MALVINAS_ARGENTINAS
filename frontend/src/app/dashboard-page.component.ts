@@ -68,7 +68,7 @@ import { NgIcon } from '@ng-icons/core';
     .summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 16px 0; }
     .card { background: var(--color-surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; text-align: center; }
     .card-label { display: block; font-size: 12px; color: var(--color-text-muted); text-transform: uppercase; }
-    .card-value { display: block; font-size: 1.5rem; font-weight: 700; color: var(--color-primary); margin-top: 4px; }
+    .card-value { display: block; font-size: 1.2rem; font-weight: 700; color: var(--color-primary); margin-top: 4px; word-break: break-all; overflow-wrap: anywhere; }
     .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 16px; }
     .chart-card { background: var(--color-surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; }
     .chart-card h3 { margin-top: 0; }
@@ -82,8 +82,13 @@ import { NgIcon } from '@ng-icons/core';
     @media (max-width: 600px) {
       .dashboard-header { flex-direction: column; align-items: stretch; }
       .dashboard-header button { width: 100%; }
-      .card { padding: 12px; }
-      .card-value { font-size: 1.1rem; }
+      .card { padding: 10px; }
+      .card-value { font-size: 1rem; word-break: break-all; }
+      .summary-cards { grid-template-columns: 1fr 1fr; gap: 8px; }
+    }
+    @media (max-width: 360px) {
+      .summary-cards { grid-template-columns: 1fr; }
+      .card-value { font-size: 0.9rem; }
     }
   `]
 })

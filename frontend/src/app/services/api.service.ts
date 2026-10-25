@@ -88,4 +88,8 @@ export class ApiService {
   concepto(codigo: string) {
     return this.http.get<Record<string, unknown>>(`${this.baseUrl}/dashboard/concepto?codigo=${encodeURIComponent(codigo)}`);
   }
+
+  conceptos() {
+    return this.http.get<{ codes: string[] }>(`${this.baseUrl}/dashboard/conceptos`);
+  }
 }

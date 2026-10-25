@@ -441,6 +441,14 @@ $router->get('/dashboard/ampliaciones', fn () => (function () {
     echo json_encode(['ampliaciones' => $stmt->fetchAll()], JSON_THROW_ON_ERROR);
 })());
 
+$router->get('/dashboard/conceptos', fn () => (function () {
+    header('Content-Type: application/json');
+    $pdo = App\Database::connect();
+    $stmt = $pdo->query('SELECT DISTINCT codigo FROM ingresos ORDER BY codigo');
+    $codes = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    echo json_encode(['codes' => $codes], JSON_THROW_ON_ERROR);
+})());
+
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $router->dispatch($method, $path);

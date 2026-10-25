@@ -1,10 +1,11 @@
 import { Component, inject, signal } from "@angular/core";
 import { DecimalPipe } from "@angular/common";
 import { ApiService } from './services/api.service';
+import { AutocompleteComponent } from './autocomplete.component';
 
 @Component({
   selector: 'app-cascade',
-  imports: [DecimalPipe],
+  imports: [DecimalPipe, AutocompleteComponent],
   template: `
     <section class="cascade">
       <h3>Efecto Cascada (Macro → Micro)</h3>
@@ -65,7 +66,7 @@ import { ApiService } from './services/api.service';
         <div class="cascade-level">
           <span class="level-label">Nivel 6: Concepto</span>
           <div class="cascade-input">
-            <input [value]="conceptoCode()" (input)="conceptoCode.set($any($event.target).value)" placeholder="Código (ej: 1.1.4.01)" />
+            <app-autocomplete [items]="conceptCodes()" (selected)="onConceptoSelected($event)" />
             <button type="button" class="cascade-btn" (click)="lookupConcepto()">Buscar</button>
           </div>
           @if (conceptoResult()) {
@@ -107,9 +108,14 @@ export class CascadeComponent {
   selectedDireccion = signal<string | null>(null);
   selectedConcepto = signal<string | null>(null);
   conceptoCode = signal('');
+  conceptCodes = signal<string[]>([]);
   conceptoResult = signal<any>(null);
 
   constructor() {
+    this.api.conceptos().subscribe({
+      next: (res) => this.conceptCodes.set(res.codes),
+      error: () => {}
+    });
     this.api.macro().subscribe({
       next: (res) => {
         this.origenes.set(Object.entries(res.totals_by_origin).map(([k, v]) => ({ key: k, value: v })));
@@ -185,6 +191,11 @@ export class CascadeComponent {
   selectDireccion(key: string) {
     this.selectedDireccion.set(key);
     this.selectedConcepto.set(null);
+  }
+
+  onConceptoSelected(code: string) {
+    this.conceptoCode.set(code);
+    this.lookupConcepto();
   }
 
   lookupConcepto() {

@@ -65,6 +65,10 @@ if ($code === 200) { echo "PASS dashboard/concurrentes\n"; $passed++; } else { e
 [$code, $res] = req('GET', "$baseUrl/dashboard/ampliaciones");
 if ($code === 200) { echo "PASS dashboard/ampliaciones\n"; $passed++; } else { echo "FAIL dashboard/ampliaciones: $code\n"; $failed++; }
 
+// Conceptos list
+[$code, $res] = req('GET', "$baseUrl/dashboard/conceptos");
+if ($code === 200) { echo "PASS dashboard/conceptos\n"; $passed++; } else { echo "FAIL dashboard/conceptos: $code\n"; $failed++; }
+
 // Concepto
 [$code, $res] = req('GET', "$baseUrl/dashboard/concepto?codigo=1.1.4.01");
 if ($code === 200) { echo "PASS concepto\n"; $passed++; } else { echo "FAIL concepto: $code\n"; $failed++; }

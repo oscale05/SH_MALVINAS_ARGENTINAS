@@ -12,7 +12,7 @@ import { NgIcon } from '@ng-icons/core';
   template: `
     <section class="dashboard">
       <div class="dashboard-header">
-        <h2>Dashboard de Hacienda</h2>
+        <h2>Tablero de Comando</h2>
       </div>
       <div class="dashboard-header">
         <input type="date" [value]="selectedDate()" (change)="onDateChange($event)" class="date-filter" />

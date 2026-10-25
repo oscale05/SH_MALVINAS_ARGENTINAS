@@ -1,0 +1,9 @@
+node_modules/
+dist/
+vendor/
+.env
+storage/
+*.log
+*.docx
+*.xlsx
+imagenes/

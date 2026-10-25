@@ -2,11 +2,12 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { ApiService } from './services/api.service';
 import { BarChartComponent } from './bar-chart.component';
+import { CascadeComponent } from './cascade.component';
 import { NgIcon } from '@ng-icons/core';
 
 @Component({
   selector: 'app-dashboard-page',
-  imports: [BarChartComponent, DecimalPipe, NgIcon],
+  imports: [BarChartComponent, DecimalPipe, NgIcon, CascadeComponent],
   template: `
     <section class="dashboard">
       <div class="dashboard-header">
@@ -42,6 +43,7 @@ import { NgIcon } from '@ng-icons/core';
           @if (hasData(data()!.direcciones)) { <div class="chart-card"><h3>Direcciones</h3><app-bar-chart [data]="data()!.direcciones" /></div> }
           @if (hasData(data()!.concurrentes)) { <div class="chart-card"><h3>Concurrentes</h3><app-bar-chart [data]="data()!.concurrentes" /></div> }
         </div>
+        <app-cascade />
         @if (ampliaciones().length > 0) {
           <div class="chart-card">
             <h3>Ampliaciones de Presupuesto</h3>

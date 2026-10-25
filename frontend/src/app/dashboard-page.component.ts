@@ -36,13 +36,29 @@ import { NgIcon } from '@ng-icons/core';
           </div>
         </div>
         <div class="charts-grid">
-          @if (hasData(data()!.origenes)) { <div class="chart-card"><h3>Orígenes</h3><app-bar-chart [data]="data()!.origenes" /></div> }
-          @if (hasData(data()!.ejes)) { <div class="chart-card"><h3>Ejes</h3><app-bar-chart [data]="data()!.ejes" /></div> }
-          @if (hasData(data()!.secretarias)) { <div class="chart-card"><h3>Secretarías</h3><app-bar-chart [data]="data()!.secretarias" /></div> }
-          @if (hasData(data()!.subsecretarias)) { <div class="chart-card"><h3>Subsecretarías</h3><app-bar-chart [data]="data()!.subsecretarias" /></div> }
-          @if (hasData(data()!.direcciones)) { <div class="chart-card"><h3>Direcciones</h3><app-bar-chart [data]="data()!.direcciones" /></div> }
-          @if (hasData(data()!.concurrentes)) { <div class="chart-card"><h3>Concurrentes</h3><app-bar-chart [data]="data()!.concurrentes" /></div> }
+          @if (hasData(data()!.origenes)) { <div class="chart-card clickable" (click)="openDetail('Orígenes', data()!.origenes)"><h3>Orígenes</h3><app-bar-chart [data]="data()!.origenes" /></div> }
+          @if (hasData(data()!.ejes)) { <div class="chart-card clickable" (click)="openDetail('Ejes', data()!.ejes)"><h3>Ejes</h3><app-bar-chart [data]="data()!.ejes" /></div> }
+          @if (hasData(data()!.secretarias)) { <div class="chart-card clickable" (click)="openDetail('Secretarías', data()!.secretarias)"><h3>Secretarías</h3><app-bar-chart [data]="data()!.secretarias" /></div> }
+          @if (hasData(data()!.subsecretarias)) { <div class="chart-card clickable" (click)="openDetail('Subsecretarías', data()!.subsecretarias)"><h3>Subsecretarías</h3><app-bar-chart [data]="data()!.subsecretarias" /></div> }
+          @if (hasData(data()!.direcciones)) { <div class="chart-card clickable" (click)="openDetail('Direcciones', data()!.direcciones)"><h3>Direcciones</h3><app-bar-chart [data]="data()!.direcciones" /></div> }
+          @if (hasData(data()!.concurrentes)) { <div class="chart-card clickable" (click)="openDetail('Concurrentes', data()!.concurrentes)"><h3>Concurrentes</h3><app-bar-chart [data]="data()!.concurrentes" /></div> }
         </div>
+        @if (selectedDetail()) {
+          <div class="detail-modal" (click)="closeDetail()">
+            <div class="detail-content" (click)="$event.stopPropagation()">
+              <h3>{{ selectedDetail()!.title }}</h3>
+              <table class="detail-table">
+                <thead><tr><th>Concepto</th><th>Total</th></tr></thead>
+                <tbody>
+                  @for (item of detailEntries(); track item.key) {
+                    <tr><td>{{ item.key }}</td><td>{{ item.value | number:'1.2-2' }}</td></tr>
+                  }
+                </tbody>
+              </table>
+              <button type="button" (click)="closeDetail()">Cerrar</button>
+            </div>
+          </div>
+        }
         <app-cascade />
         @if (ampliaciones().length > 0) {
           <div class="chart-card">
@@ -93,8 +109,15 @@ import { NgIcon } from '@ng-icons/core';
     .card-label { display: block; font-size: 12px; color: var(--color-text-muted); text-transform: uppercase; }
     .card-value { display: block; font-size: 1.2rem; font-weight: 700; color: var(--color-primary); margin-top: 4px; word-break: break-all; overflow-wrap: anywhere; }
     .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 16px; }
-    .chart-card { background: var(--color-surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; }
+    .chart-card { background: var(--color-surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+    .chart-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
     .chart-card h3 { margin-top: 0; }
+    .detail-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 2000; }
+    .detail-content { background: white; border-radius: var(--radius); padding: 24px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
+    .detail-table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+    .detail-table th, .detail-table td { padding: 8px; border-bottom: 1px solid var(--color-border); text-align: left; }
+    .detail-table th { font-weight: 600; color: var(--color-primary); }
+    .detail-content button { margin-top: 12px; }
     .error { color: var(--color-error); }
     .loading { color: var(--color-text-muted); font-style: italic; }
     .user-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
@@ -133,6 +156,7 @@ export class DashboardPageComponent implements OnInit {
   deleteCodigo = signal('');
   newPassword = signal('nueva123');
   data = signal<{ rows: number; total: number; origenes: Record<string, number>; ejes: Record<string, number>; secretarias: Record<string, number>; subsecretarias: Record<string, number>; direcciones: Record<string, number>; concurrentes: Record<string, number> } | null>(null);
+  selectedDetail = signal<{ title: string; data: Record<string, number> } | null>(null);
   ampliaciones = signal<Array<{ codigo: string; concepto: string; tipo: string; valor: number }>>([]);
   conceptoCode = signal('');
   conceptoResult = signal<any>(null);
@@ -182,6 +206,20 @@ export class DashboardPageComponent implements OnInit {
       next: () => { this.crudStatus.set('Tasa eliminada'); this.load(); },
       error: () => this.crudStatus.set('Error al eliminar')
     });
+  }
+
+  openDetail(title: string, data: Record<string, number>) {
+    this.selectedDetail.set({ title, data });
+  }
+
+  closeDetail() {
+    this.selectedDetail.set(null);
+  }
+
+  detailEntries(): { key: string; value: number }[] {
+    const d = this.selectedDetail();
+    if (!d) return [];
+    return Object.entries(d.data).map(([key, value]) => ({ key, value })).sort((a, b) => b.value - a.value);
   }
 
   load() {

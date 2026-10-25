@@ -20,9 +20,14 @@ import { Component, computed, Input, OnChanges, signal } from "@angular/core";
                   (click)="selected.set(selected() === i ? -1 : i)"
                 />
               }
-              <text [attr.x]="size/2" [attr.y]="size/2 - 6" text-anchor="middle" font-size="12" fill="#374151" font-weight="600">{{ totalLabel }}</text>
-              <text [attr.x]="size/2" [attr.y]="size/2 + 10" text-anchor="middle" font-size="10" fill="#6b7280">{{ totalValue }}</text>
             </svg>
+            @if (activeIndex() >= 0) {
+              <div class="pie-tooltip">
+                <strong>{{ items[activeIndex()].label }}</strong>
+                <span class="pct">{{ items[activeIndex()].percent }}%</span>
+                <span>{{ formatValue(items[activeIndex()].value) }}</span>
+              </div>
+            }
           </div>
           <div class="pie-legend">
             @for (item of items; track item.label; let i = $index) {
@@ -76,8 +81,7 @@ export class BarChartComponent implements OnChanges {
     const entries = Object.entries(this.data);
     if (entries.length === 0) { this.items = []; this.total = 0; this.totalLabel = ''; this.totalValue = ''; return; }
     this.total = entries.reduce((sum, [, v]) => sum + v, 0);
-    this.totalLabel = 'Total';
-    this.totalValue = this.formatValue(this.total);
+
     let startAngle = -Math.PI / 2;
     this.items = entries.map(([label, value]) => {
       const percent = this.total > 0 ? ((value / this.total) * 100).toFixed(1) : '0';

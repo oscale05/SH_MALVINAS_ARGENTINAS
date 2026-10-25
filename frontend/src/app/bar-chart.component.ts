@@ -7,57 +7,44 @@ import { Component, Input, OnChanges } from '@angular/core';
       @if (items.length === 0) {
         <p class="no-data">Sin datos</p>
       } @else {
-        <div class="pie-container">
-          <svg [attr.viewBox]="'0 0 ' + size + ' ' + size" class="pie-svg">
+        <div class="pie-layout">
+          <div class="pie-container">
+            <svg [attr.viewBox]="'0 0 ' + size + ' ' + size" class="pie-svg">
+              @for (item of items; track item.label; let i = $index) {
+                <path
+                  [attr.d]="item.path"
+                  [attr.fill]="colors[i % colors.length]"
+                  class="pie-slice"
+                  (mouseenter)="hovered = i"
+                  (mouseleave)="hovered = -1"
+                  (click)="selected = selected === i ? -1 : i"
+                />
+              }
+              <text [attr.x]="size/2" [attr.y]="size/2 - 6" text-anchor="middle" font-size="12" fill="#374151" font-weight="600">{{ totalLabel }}</text>
+              <text [attr.x]="size/2" [attr.y]="size/2 + 10" text-anchor="middle" font-size="10" fill="#6b7280">{{ totalValue }}</text>
+            </svg>
+          </div>
+          <div class="pie-legend">
             @for (item of items; track item.label; let i = $index) {
-              <path
-                [attr.d]="item.path"
-                [attr.fill]="colors[i % colors.length]"
-                class="pie-slice"
-                (mouseenter)="hovered = i"
-                (mouseleave)="hovered = -1"
-                (click)="selected = selected === i ? -1 : i"
-              />
+              <div class="legend-item" (mouseenter)="hovered = i" (mouseleave)="hovered = -1" (click)="selected = selected === i ? -1 : i">
+                <span class="legend-color" [style.background]="colors[i % colors.length]"></span>
+                <span class="legend-label">{{ item.label }}</span>
+                <span class="legend-value">{{ formatValue(item.value) }} ({{ item.percent }}%)</span>
+              </div>
             }
-            <!-- Center text -->
-            <text [attr.x]="size/2" [attr.y]="size/2 - 6" text-anchor="middle" font-size="12" fill="#374151" font-weight="600">{{ totalLabel }}</text>
-            <text [attr.x]="size/2" [attr.y]="size/2 + 10" text-anchor="middle" font-size="10" fill="#6b7280">{{ totalValue }}</text>
-          </svg>
-          @if (activeIndex >= 0) {
-            <div class="pie-tooltip">
-              <strong>{{ items[activeIndex].label }}</strong>
-              <span>{{ formatValue(items[activeIndex].value) }} ({{ items[activeIndex].percent }}%)</span>
-            </div>
-          }
-        </div>
-        <div class="pie-legend">
-          @for (item of items; track item.label; let i = $index) {
-            <div class="legend-item" (mouseenter)="hovered = i" (mouseleave)="hovered = -1" (click)="selected = selected === i ? -1 : i">
-              <span class="legend-color" [style.background]="colors[i % colors.length]"></span>
-              <span class="legend-label">{{ item.label }}</span>
-              <span class="legend-value">{{ formatValue(item.value) }} ({{ item.percent }}%)</span>
-            </div>
-          }
+          </div>
         </div>
       }
     </div>
   `,
   styles: [`
     .chart-wrapper { width: 100%; max-width: 100%; }
-    .pie-container { position: relative; width: 100%; max-width: 280px; margin: 0 auto; }
+    .pie-layout { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .pie-container { position: relative; width: 100%; max-width: 200px; flex-shrink: 0; }
     .pie-svg { width: 100%; height: auto; }
     .pie-slice { cursor: pointer; transition: opacity 0.2s; stroke: white; stroke-width: 2; }
     .pie-slice:hover { opacity: 0.8; }
-    .pie-tooltip {
-      position: absolute; top: 4px; right: 4px;
-      background: rgba(51, 65, 85, 0.95); color: white;
-      padding: 6px 12px; border-radius: 6px; font-size: 12px;
-      display: flex; flex-direction: column; gap: 2px; align-items: flex-end;
-      pointer-events: none; z-index: 10; white-space: nowrap;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    }
-    .pie-tooltip strong { font-size: 13px; }
-    .pie-legend { margin-top: 12px; display: flex; flex-direction: column; gap: 4px; }
+    .pie-legend { flex: 1; min-width: 150px; display: flex; flex-direction: column; gap: 4px; }
     .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; padding: 2px 4px; border-radius: 4px; }
     .legend-item:hover { background: #f3f4f6; }
     .legend-color { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }

@@ -17,10 +17,15 @@ import { ApiService } from './services/api.service';
     </div>
   `,
   styles: [`
-    .login-container { max-width: 400px; margin: 40px auto; text-align: center; }
-    .login-logo { height: 80px; margin-bottom: 16px; }
-    .login-form { display: flex; flex-direction: column; gap: 12px; align-items: center; margin-top: 16px; }
-    .login-form input { max-width: 100%; }
+    .login-container { max-width: 400px; margin: 40px auto; text-align: center; padding: 0 16px; }
+    .login-logo { height: 80px; margin-bottom: 16px; max-width: 100%; }
+    .login-form { display: flex; flex-direction: column; gap: 12px; align-items: center; margin-top: 16px; width: 100%; }
+    .login-form input { max-width: 100%; width: 100%; }
+    .login-form button { width: 100%; }
+    @media (max-width: 480px) {
+      .login-container { margin: 20px auto; }
+      .login-logo { height: 60px; }
+    }
   `]
 })
 export class LoginComponent {

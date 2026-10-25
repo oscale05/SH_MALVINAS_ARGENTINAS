@@ -63,3 +63,21 @@ input:focus { outline: none; border-color: var(--color-primary); }
   padding: 16px;
   margin: 8px 0;
 }
+
+/* Responsive */
+@media (max-width: 768px) {
+  body { font-size: 14px; }
+  .app-main { padding: 8px; }
+  input { max-width: 100%; }
+  button { width: 100%; max-width: 100%; }
+  .summary-cards { grid-template-columns: 1fr 1fr; }
+  .charts-grid { grid-template-columns: 1fr; }
+  .card-value { font-size: 1.2rem; }
+}
+
+@media (max-width: 480px) {
+  .summary-cards { grid-template-columns: 1fr; }
+  h2 { font-size: 1.2rem; }
+  h3 { font-size: 1rem; }
+  .chart-svg { min-height: 100px; }
+}

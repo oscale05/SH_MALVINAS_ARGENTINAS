@@ -3,23 +3,41 @@
 Auth:
 - POST /auth/login
 - POST /auth/logout
+- POST /auth/change-password
 
-Operador:
+Administrador:
 - POST /uploads
 - GET /uploads
-- GET /uploads/{id}/errors
+- GET /uploads/rows?upload_id=
+- GET /users
+- GET /dashboard/conceptos
 
-Observador:
-- GET /dashboard/macro
-- GET /dashboard/origen/{id}
-- GET /dashboard/eje/{id}
-- GET /dashboard/secretaria/{id}
-- GET /dashboard/subsecretaria/{id}
-- GET /dashboard/direccion/{id}
-- GET /dashboard/concepto/{codigo}
+Dashboard:
+- GET /dashboard/macro?upload_id=
+- GET /dashboard/eje?upload_id=
+- GET /dashboard/secretaria?eje_id=
+- GET /dashboard/subsecretaria?secretaria_id=
+- GET /dashboard/direccion?subsecretaria_id=
+- GET /dashboard/concepto?codigo=
+- GET /dashboard/completo
+- GET /dashboard/summary
+- GET /dashboard/concurrentes
+- GET /dashboard/ampliaciones
+- GET /dashboard/resumen
+
+Health:
+- GET /health
+- GET /health/db
+- GET /health/full
+
+Export:
+- GET /export/csv?upload_id=
+
+Version:
+- GET /version
 
 Filtros comunes:
-- fecha, ejercicio, origen, eje, secretaria, subsecretaria, direccion.
+- upload_id, eje_id, secretaria_id, subsecretaria_id, codigo
 
 Errores:
 - 400 validación

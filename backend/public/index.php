@@ -90,8 +90,10 @@ $router->post('/uploads', fn () => (function () {
     $userStmt = $pdo->prepare('SELECT id FROM users WHERE username = ?');
     $userStmt->execute([(string)($payload['sub'] ?? 'administrador')]);
     $userId = (int) $userStmt->fetchColumn() ?: 1;
-    $stmt = $pdo->prepare('INSERT INTO uploads (filename, uploaded_by, status) VALUES (?, ?, ?)');
-    $stmt->execute([basename($target), $userId, 'processed']);
+    $mes = (int) date('n');
+    $anio = (int) date('Y');
+    $stmt = $pdo->prepare('INSERT INTO uploads (filename, uploaded_by, status, mes, anio) VALUES (?, ?, ?, ?, ?)');
+    $stmt->execute([basename($target), $userId, 'processed', $mes, $anio]);
     $uploadId = (int) $pdo->lastInsertId();
 
     foreach ($rows as $row) {
@@ -198,7 +200,7 @@ $router->post('/uploads', fn () => (function () {
                 $direccionId = (int) $pdo->lastInsertId();
             }
         }
-        $insert = $pdo->prepare('INSERT INTO ingresos (upload_id, codigo, imputacion, presupuesto, recaudado_fecha_1, recaudado_fecha_2, total, porcentaje_rc, origen_id, eje_id, secretaria_id, subsecretaria_id, direccion_general_id, direccion_id, concurrente_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+        $insert = $pdo->prepare('INSERT INTO ingresos (upload_id, codigo, imputacion, presupuesto, recaudado_fecha_1, recaudado_fecha_2, total, porcentaje_rc, origen_id, eje_id, secretaria_id, subsecretaria_id, direccion_general_id, direccion_id, concurrente_id, mes, anio) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
         $insert->execute([
             $uploadId,
             (string) ($row['Agrupamiento'] ?? ''),
@@ -215,6 +217,8 @@ $router->post('/uploads', fn () => (function () {
             $direccionGeneralId,
             $direccionId,
             $concurrenteId,
+            $mes,
+            $anio,
         ]);
     }
 
@@ -232,7 +236,13 @@ $router->get('/dashboard/macro', fn () => (function () {
     header('Content-Type: application/json');
     $pdo = App\Database::connect();
     $uploadId = (int) ($_GET['upload_id'] ?? 0);
-    $where = $uploadId > 0 ? ' WHERE upload_id = ' . $uploadId : '';
+    $mes = (int) ($_GET['mes'] ?? 0);
+    $anio = (int) ($_GET['anio'] ?? 0);
+    $conditions = [];
+    if ($uploadId > 0) $conditions[] = 'upload_id = ' . $uploadId;
+    if ($mes > 0) $conditions[] = 'mes = ' . $mes;
+    if ($anio > 0) $conditions[] = 'anio = ' . $anio;
+    $where = $conditions ? ' WHERE ' . implode(' AND ', $conditions) : '';
     $stmt = $pdo->query('SELECT COUNT(*) AS rows_count, COALESCE(SUM(total),0) AS total FROM ingresos' . $where);
     $summary = $stmt->fetch();
     $stmt = $pdo->query("SELECT COALESCE(o.nombre, 'SIN ORIGEN') AS origin, SUM(i.total) AS total FROM ingresos i LEFT JOIN origenes o ON o.id = i.origen_id" . $where . " GROUP BY origin");
@@ -519,6 +529,18 @@ $router->delete('/tasas', fn () => (function () {
     $stmt = $pdo->prepare('DELETE FROM ingresos WHERE codigo = ?');
     $stmt->execute([$codigo]);
     echo json_encode(['status' => 'ok', 'deleted' => $stmt->rowCount()], JSON_THROW_ON_ERROR);
+})());
+
+$router->get('/dashboard/mensual', fn () => (function () {
+    header('Content-Type: application/json');
+    $pdo = App\Database::connect();
+    $anio = (int) ($_GET['anio'] ?? date('Y'));
+    $stmt = $pdo->query("SELECT mes, SUM(total) AS total, COUNT(*) AS rows_count FROM ingresos WHERE anio = $anio GROUP BY mes ORDER BY mes");
+    $months = [];
+    foreach ($stmt->fetchAll() as $row) {
+        $months[(int)$row['mes']] = ['total' => (float)$row['total'], 'rows' => (int)$row['rows_count']];
+    }
+    echo json_encode(['anio' => $anio, 'meses' => $months], JSON_THROW_ON_ERROR);
 })());
 
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';

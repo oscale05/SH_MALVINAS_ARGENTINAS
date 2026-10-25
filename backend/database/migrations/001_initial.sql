@@ -11,6 +11,8 @@ CREATE TABLE uploads (
     filename VARCHAR(255) NOT NULL,
     uploaded_by BIGINT UNSIGNED NOT NULL,
     uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    mes TINYINT UNSIGNED NULL,
+    anio SMALLINT UNSIGNED NULL,
     status VARCHAR(50) NOT NULL,
     FOREIGN KEY (uploaded_by) REFERENCES users(id)
 );

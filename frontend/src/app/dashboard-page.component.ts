@@ -18,6 +18,16 @@ import { NgIcon } from '@ng-icons/core';
         </div>
       </div>
       <div class="dashboard-header">
+        <select [value]="selectedMes()" (change)="selectedMes.set(+$any($event.target).value); load()">
+          @for (m of [1,2,3,4,5,6,7,8,9,10,11,12]; track m) {
+            <option [value]="m">{{ m }}</option>
+          }
+        </select>
+        <select [value]="selectedAnio()" (change)="selectedAnio.set(+$any($event.target).value); load()">
+          @for (a of [2024,2025,2026]; track a) {
+            <option [value]="a">{{ a }}</option>
+          }
+        </select>
         <button type="button" (click)="load()" [disabled]="loading()" class="btn-primary">
           <ng-icon name="heroArrowPath" /> {{ loading() ? 'Cargando...' : 'Actualizar' }}
         </button>
@@ -159,6 +169,9 @@ export class DashboardPageComponent implements OnInit {
   selectedDetail = signal<{ title: string; data: Record<string, number> } | null>(null);
   ampliaciones = signal<Array<{ codigo: string; concepto: string; tipo: string; valor: number }>>([]);
   conceptoCode = signal('');
+  selectedMes = signal<number>(new Date().getMonth() + 1);
+  selectedAnio = signal<number>(new Date().getFullYear());
+  uploadId = signal<number | undefined>(undefined);
   conceptoResult = signal<any>(null);
 
   isAdministrador = computed(() => {
@@ -225,6 +238,16 @@ export class DashboardPageComponent implements OnInit {
   load() {
     this.loading.set(true);
     this.error.set('');
+    this.api.macro(undefined, this.selectedMes(), this.selectedAnio()).subscribe({
+      next: (res) => {
+        this.loading.set(false);
+        this.data.set({ rows: res.rows, total: res.total, origenes: res.totals_by_origin, ejes: {}, secretarias: {}, subsecretarias: {}, direcciones: {}, concurrentes: {} });
+      },
+      error: () => {
+        this.loading.set(false);
+        this.error.set('Error al cargar datos del dashboard');
+      }
+    });
     this.api.completo().subscribe({
       next: (res) => {
         this.loading.set(false);

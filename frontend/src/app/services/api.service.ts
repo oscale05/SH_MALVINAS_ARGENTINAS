@@ -25,9 +25,18 @@ export class ApiService {
     });
   }
 
-  macro(uploadId?: number) {
-    const q = uploadId ? `?upload_id=${uploadId}` : '';
-    return this.http.get<{ rows: number; totals_by_origin: Record<string, number> }>(`${this.baseUrl}/dashboard/macro${q}`);
+  macro(uploadId?: number, mes?: number, anio?: number) {
+    const params = [];
+    if (uploadId) params.push(`upload_id=${uploadId}`);
+    if (mes) params.push(`mes=${mes}`);
+    if (anio) params.push(`anio=${anio}`);
+    const q = params.length ? '?' + params.join('&') : '';
+    return this.http.get<{ rows: number; total: number; totals_by_origin: Record<string, number> }>(`${this.baseUrl}/dashboard/macro${q}`);
+  }
+
+  mensual(anio?: number) {
+    const q = anio ? `?anio=${anio}` : '';
+    return this.http.get<{ anio: number; meses: Record<string, { total: number; rows: number }> }>(`${this.baseUrl}/dashboard/mensual${q}`);
   }
 
   subsecretaria(secretariaId?: number) {

@@ -174,7 +174,7 @@ export class DashboardPageComponent implements OnInit {
     try { return JSON.parse(atob(token.split('.')[1])).role === 'administrador'; } catch { return false; }
   });
 
-  ngOnInit() { this.load(); this.loadAmpliaciones(); }
+  ngOnInit() { this.load(); this.loadAmpliaciones(); this.loadConceptCodes(); }
 
   hasData(obj: Record<string, number>): boolean {
     return Object.keys(obj).length > 0;

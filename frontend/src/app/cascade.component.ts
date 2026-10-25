@@ -66,7 +66,7 @@ import { AutocompleteComponent } from './autocomplete.component';
         <div class="cascade-level">
           <span class="level-label">Nivel 6: Concepto</span>
           <div class="cascade-input">
-            <app-autocomplete [items]="conceptCodes()" (selected)="onConceptoSelected($event)" />
+            <app-autocomplete [items]="conceptItems()" (selected)="onConceptoSelected($event)" />
             <button type="button" class="cascade-btn" (click)="lookupConcepto()">Buscar</button>
           </div>
           @if (conceptoResult()) {
@@ -108,12 +108,12 @@ export class CascadeComponent {
   selectedDireccion = signal<string | null>(null);
   selectedConcepto = signal<string | null>(null);
   conceptoCode = signal('');
-  conceptCodes = signal<string[]>([]);
+  conceptItems = signal<Array<{ codigo: string; origen: string }>>([]);
   conceptoResult = signal<any>(null);
 
   constructor() {
     this.api.conceptos().subscribe({
-      next: (res) => this.conceptCodes.set(res.codes),
+      next: (res) => this.conceptItems.set(res.items),
       error: () => {}
     });
     this.api.macro().subscribe({

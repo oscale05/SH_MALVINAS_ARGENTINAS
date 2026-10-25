@@ -7,6 +7,8 @@
   align-items: center;
   justify-content: space-between;
   box-shadow: var(--shadow);
+  flex-wrap: wrap;
+  gap: 8px;
 }
 .app-header .brand-text { font-size: 1.25rem; font-weight: 700; color: white; }
 .app-header nav a {
@@ -16,4 +18,11 @@
   font-weight: 500;
 }
 .app-header nav a:hover { text-decoration: underline; }
-.app-main { flex: 1; padding: 24px; max-width: 1200px; margin: 0 auto; width: 100%; }
+.app-main { flex: 1; padding: 16px; max-width: 1200px; margin: 0 auto; width: 100%; }
+
+@media (max-width: 600px) {
+  .app-header { padding: 8px 12px; }
+  .app-header .brand-text { font-size: 1rem; }
+  .app-header nav a { margin-left: 8px; font-size: 14px; }
+  .app-main { padding: 8px; }
+}

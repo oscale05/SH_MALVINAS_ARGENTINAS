@@ -1,28 +1,67 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 
 @Component({
   selector: 'app-bar-chart',
   template: `
-    <svg [attr.width]="width" [attr.height]="height" role="img" aria-label="Gráfico de barras">
-      @for (item of items; track item.label; let i = $index) {
-        <rect [attr.x]="i * barWidth + 10" [attr.y]="height - item.value * item.scale" [attr.width]="barWidth - 4" [attr.height]="item.value * item.scale" fill="#3b82f6" />
-        <text [attr.x]="i * barWidth + 10" [attr.y]="height - 4" font-size="10">{{ item.label }}</text>
+    <div class="chart-wrapper">
+      @if (items.length === 0) {
+        <p class="no-data">Sin datos</p>
+      } @else {
+        <svg [attr.viewBox]="'0 0 ' + width + ' ' + height" preserveAspectRatio="xMidYMid meet" class="chart-svg">
+          @for (item of items; track item.label; let i = $index) {
+            <g>
+              <rect [attr.x]="i * barWidth + 4" [attr.y]="height - item.barH - 20" [attr.width]="barWidth - 8" [attr.height]="item.barH" [attr.fill]="colors[i % colors.length]" rx="4" />
+              <text [attr.x]="i * barWidth + barWidth / 2" [attr.y]="height - 4" text-anchor="middle" font-size="9" fill="#6b7280">{{ truncate(item.label) }}</text>
+              <text [attr.x]="i * barWidth + barWidth / 2" [attr.y]="height - item.barH - 24" text-anchor="middle" font-size="9" fill="#374151">{{ formatValue(item.value) }}</text>
+            </g>
+          }
+        </svg>
       }
-    </svg>
-  `
+    </div>
+  `,
+  styles: [`
+    .chart-wrapper { width: 100%; max-width: 100%; overflow-x: auto; }
+    .chart-svg { width: 100%; height: auto; min-height: 120px; }
+    .no-data { color: #6b7280; font-style: italic; font-size: 14px; }
+  `]
 })
-export class BarChartComponent {
+export class BarChartComponent implements OnChanges {
   @Input() data: Record<string, number> = {};
-  width = 320;
-  height = 120;
+  width = 400;
+  height = 160;
+  colors = ['#324687', '#55a53c', '#4a5fa0', '#468a31', '#808cb3', '#373c5f'];
 
-  get items() {
-    const max = Math.max(...Object.values(this.data), 1);
-    return Object.entries(this.data).map(([label, value]) => ({ label, value, scale: 100 / max }));
+  items: { label: string; value: number; barH: number }[] = [];
+
+  ngOnChanges(changes: SimpleChanges) {
+    this.computeItems();
+  }
+
+  private computeItems() {
+    const entries = Object.entries(this.data);
+    if (entries.length === 0) { this.items = []; return; }
+    const max = Math.max(...entries.map(([, v]) => v), 1);
+    this.width = Math.max(300, entries.length * 60);
+    this.items = entries.map(([label, value]) => ({
+      label,
+      value,
+      barH: Math.max(4, (value / max) * (this.height - 40))
+    }));
   }
 
   get barWidth() {
-    const count = Math.max(Object.keys(this.data).length, 1);
-    return this.width / count;
+    return this.width / Math.max(this.items.length, 1);
+  }
+
+  truncate(label: string): string {
+    return label.length > 12 ? label.substring(0, 10) + '..' : label;
+  }
+
+  formatValue(v: number): string {
+    if (v >= 1e12) return (v / 1e12).toFixed(1) + 'T';
+    if (v >= 1e9) return (v / 1e9).toFixed(1) + 'B';
+    if (v >= 1e6) return (v / 1e6).toFixed(1) + 'M';
+    if (v >= 1e3) return (v / 1e3).toFixed(1) + 'K';
+    return v.toFixed(0);
   }
 }

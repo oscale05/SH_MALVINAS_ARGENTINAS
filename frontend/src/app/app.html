@@ -2,7 +2,6 @@
   <header class="app-header">
     <span class="brand-text">Secretaría de Hacienda</span>
     <nav>
-      <a routerLink="/" class="nav-dashboard">Dashboard</a>
       @if (isLoggedIn) {
         <div class="user-menu">
           <button type="button" class="avatar-btn" (click)="toggleMenu()">

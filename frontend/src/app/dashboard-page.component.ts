@@ -11,6 +11,12 @@ import { NgIcon } from '@ng-icons/core';
     <section class="dashboard">
       <div class="dashboard-header">
         <h2>Dashboard de Hacienda</h2>
+        <div class="user-bar">
+          <span class="role-badge">{{ isOperador() ? 'Operador' : 'Observador' }}</span>
+          <button type="button" class="btn-logout" (click)="logout()">Salir</button>
+        </div>
+      </div>
+      <div class="dashboard-header">
         <button type="button" (click)="load()" [disabled]="loading()" class="btn-primary">
           <ng-icon name="heroArrowPath" /> {{ loading() ? 'Cargando...' : 'Actualizar' }}
         </button>
@@ -37,6 +43,23 @@ import { NgIcon } from '@ng-icons/core';
           @if (hasData(data()!.concurrentes)) { <div class="chart-card"><h3>Concurrentes</h3><app-bar-chart [data]="data()!.concurrentes" /></div> }
         </div>
       }
+
+      @if (isOperador()) {
+        <div class="admin-panel">
+          <h3>Administración</h3>
+          <div class="admin-section">
+            <h4>Carga de Excel</h4>
+            <input type="file" (change)="onFileSelected($event)" />
+            @if (uploadStatus()) { <p>{{ uploadStatus() }}</p> }
+          </div>
+          <div class="admin-section">
+            <h4>Cambio de clave</h4>
+            <input [value]="newPassword()" (input)="newPassword.set($any($event.target).value)" placeholder="nueva clave" type="password" />
+            <button type="button" (click)="changePassword()">Cambiar clave</button>
+            @if (passwordStatus()) { <p>{{ passwordStatus() }}</p> }
+          </div>
+        </div>
+      }
     </section>
   `,
   styles: [`
@@ -51,22 +74,33 @@ import { NgIcon } from '@ng-icons/core';
     .chart-card h3 { margin-top: 0; }
     .error { color: var(--color-error); }
     .loading { color: var(--color-text-muted); font-style: italic; }
+    .user-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+    .role-badge { background: var(--color-primary); color: white; padding: 2px 10px; border-radius: 12px; font-size: 12px; }
+    .btn-logout { background: var(--color-error); padding: 4px 12px; font-size: 12px; }
+    .admin-panel { background: var(--color-bg); border-radius: var(--radius); padding: 12px; margin: 12px 0; border: 1px solid var(--color-border); }
+    .admin-section { margin: 8px 0; display: flex; flex-direction: column; gap: 8px; }
     @media (max-width: 600px) {
       .dashboard-header { flex-direction: column; align-items: stretch; }
       .dashboard-header button { width: 100%; }
+      .card { padding: 12px; }
+      .card-value { font-size: 1.1rem; }
     }
   `]
 })
 export class DashboardPageComponent implements OnInit {
   private api = inject(ApiService);
   loading = signal(false);
+  error = signal('');
+  uploadStatus = signal('');
+  passwordStatus = signal('');
+  newPassword = signal('nueva123');
+  data = signal<{ rows: number; total: number; origenes: Record<string, number>; ejes: Record<string, number>; secretarias: Record<string, number>; subsecretarias: Record<string, number>; direcciones: Record<string, number>; concurrentes: Record<string, number> } | null>(null);
+
   isOperador = computed(() => {
     const token = localStorage.getItem('token');
     if (!token) return false;
     try { return JSON.parse(atob(token.split('.')[1])).role === 'operador'; } catch { return false; }
   });
-  error = signal('');
-  data = signal<{ rows: number; total: number; origenes: Record<string, number>; ejes: Record<string, number>; secretarias: Record<string, number>; subsecretarias: Record<string, number>; direcciones: Record<string, number>; concurrentes: Record<string, number> } | null>(null);
 
   ngOnInit() { this.load(); }
 
@@ -91,6 +125,24 @@ export class DashboardPageComponent implements OnInit {
         this.loading.set(false);
         this.error.set('Error al cargar datos del dashboard');
       }
+    });
+  }
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    this.uploadStatus.set('cargando...');
+    this.api.upload(file).subscribe({
+      next: (res) => this.uploadStatus.set(`ok: ${res.rows} filas`),
+      error: () => this.uploadStatus.set('error')
+    });
+  }
+
+  changePassword() {
+    this.api.changePassword(this.newPassword()).subscribe({
+      next: () => this.passwordStatus.set('ok'),
+      error: () => this.passwordStatus.set('error')
     });
   }
 }

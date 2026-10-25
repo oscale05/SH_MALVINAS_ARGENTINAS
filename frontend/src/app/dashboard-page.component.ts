@@ -2,12 +2,13 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { ApiService } from './services/api.service';
 import { BarChartComponent } from './bar-chart.component';
+import { AutocompleteComponent } from './autocomplete.component';
 import { CascadeComponent } from './cascade.component';
 import { NgIcon } from '@ng-icons/core';
 
 @Component({
   selector: 'app-dashboard-page',
-  imports: [BarChartComponent, DecimalPipe, NgIcon, CascadeComponent],
+  imports: [BarChartComponent, DecimalPipe, NgIcon, CascadeComponent, AutocompleteComponent],
   template: `
     <section class="dashboard">
       <div class="dashboard-header">
@@ -95,12 +96,8 @@ import { NgIcon } from '@ng-icons/core';
           </div>
           <div class="admin-section">
             <h4>Baja de Tasa</h4>
-            <select [value]="deleteCodigo()" (change)="deleteCodigo.set($any($event.target).value)" class="select-full">
-              <option value="">Seleccionar tasa...</option>
-              @for (c of conceptCodes(); track c.codigo) {
-                <option [value]="c.codigo">{{ c.codigo }} - {{ c.imputacion }}</option>
-              }
-            </select>
+            <app-autocomplete [items]="conceptCodes()" (selected)="deleteCodigo.set($event)" />
+            @if (deleteCodigo()) { <p class="selected-code">Seleccionado: {{ deleteCodigo() }}</p> }
             <button type="button" (click)="deleteTasa()" class="btn-danger">Eliminar Tasa</button>
           </div>
         </div>

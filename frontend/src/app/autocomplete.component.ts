@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 interface AutocompleteItem {
   codigo: string;
   imputacion: string;
-  origen: string;
+  origen?: string;
 }
 
 @Component({
@@ -29,7 +29,7 @@ interface AutocompleteItem {
                 <strong>{{ item.codigo }}</strong>
                 <span class="concepto">{{ item.imputacion }}</span>
               </div>
-              <span class="origin">{{ item.origen }}</span>
+              @if (item.origen) { <span class="origin">{{ item.origen }}</span> }
             </li>
           }
         </ul>
@@ -64,7 +64,7 @@ export class AutocompleteComponent {
     return (
       item.codigo.toLowerCase().startsWith(q) ||
       item.imputacion.toLowerCase().startsWith(q) ||
-      item.origen.toLowerCase().includes(q)
+      (item.origen || '').toLowerCase().includes(q)
     );
   }
 

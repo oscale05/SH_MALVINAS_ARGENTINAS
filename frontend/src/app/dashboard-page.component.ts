@@ -48,7 +48,7 @@ import { NgIcon } from '@ng-icons/core';
           <div class="chart-card">
             <h3>Ampliaciones de Presupuesto</h3>
             @for (a of ampliaciones(); track a.codigo) {
-              <p>{{ a.codigo }} - {{ a.concepto }}: {{ a.valor }} ({{ a.tipo }})</p>
+              <p>{{ a.codigo }} - {{ a.concepto }}: {{ a.valor | number:'1.2-2' }} ({{ a.tipo }})</p>
             }
           </div>
         }

@@ -72,7 +72,7 @@ import { AutocompleteComponent } from './autocomplete.component';
           @if (conceptoResult()) {
             <div class="concepto-result">
               <p><strong>{{ conceptoResult().codigo }}</strong> - {{ conceptoResult().imputacion }}</p>
-              <p>Presupuesto: {{ conceptoResult().presupuesto }} | Total: {{ conceptoResult().total }}</p>
+              <p>Presupuesto: {{ conceptoResult().presupuesto | number:'1.2-2' }} | Total: {{ conceptoResult().total | number:'1.2-2' }}</p>
             </div>
           }
         </div>

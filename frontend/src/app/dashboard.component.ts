@@ -1,17 +1,18 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
 import { ApiService } from './services/api.service';
 import { BarChartComponent } from './bar-chart.component';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [BarChartComponent],
+  imports: [BarChartComponent, DecimalPipe],
   template: `
     <section>
       <h2>Dashboard</h2>
       <button type="button" (click)="load()">Cargar</button>
       <p>{{ status() }}</p>
       @if (data()) {
-        <p>Filas: {{ data()!.rows }} | Total: {{ data()!.total }}</p>
+        <p>Filas: {{ data()!.rows }} | Total: {{ data()!.total | number:'1.0-0' }}</p>
         <app-bar-chart [data]="data()!.origenes" />
         <app-bar-chart [data]="data()!.ejes" />
         <app-bar-chart [data]="data()!.secretarias" />

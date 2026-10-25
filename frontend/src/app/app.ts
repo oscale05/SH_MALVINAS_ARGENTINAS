@@ -1,4 +1,4 @@
-import { Component, inject, signal } from "@angular/core";
+import { Component, ElementRef, inject, signal, viewChild } from "@angular/core";
 import { RouterOutlet, RouterLink } from '@angular/router';
 import { NgIcon } from '@ng-icons/core';
 import { ApiService } from './services/api.service';
@@ -16,6 +16,7 @@ export class App {
   newPassword = signal('');
   confirmPassword = signal('');
   showPassword = signal(false);
+  newPwdInput = viewChild<ElementRef<HTMLInputElement>>('newPwdInput');
   passwordStatus = signal('');
 
   get username(): string {
@@ -64,7 +65,19 @@ export class App {
   }
 
   toggleShowPassword() {
+    const input = this.newPwdInput()?.nativeElement;
+    const pos = input?.selectionStart ?? 0;
+    const val = input?.value ?? '';
     this.showPassword.update(v => !v);
+    // Refocus input after type change with longer delay
+    setTimeout(() => {
+      const el = this.newPwdInput()?.nativeElement;
+      if (el) {
+        el.focus();
+        el.value = val;
+        el.setSelectionRange(pos, pos);
+      }
+    }, 50);
   }
 
   changePassword() {

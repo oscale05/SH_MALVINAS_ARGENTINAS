@@ -30,8 +30,8 @@
       <div class="modal-content" (click)="$event.stopPropagation()">
         <h3>Cambiar clave</h3>
         <div class="modal-field">
-          <input [type]="showPassword() ? 'text' : 'password'" [value]="newPassword()" (input)="newPassword.set($any($event.target).value)" placeholder="Nueva clave" autofocus (click)="$event.stopPropagation()" />
-          <button type="button" class="eye-btn" (click)="toggleShowPassword()">
+          <input #newPwdInput [type]="showPassword() ? 'text' : 'password'" [value]="newPassword()" (input)="newPassword.set($any($event.target).value)" placeholder="Nueva clave" (click)="$event.stopPropagation()" />
+          <button type="button" class="eye-btn" (click)="toggleShowPassword(); $event.stopPropagation()" (mousedown)="$event.preventDefault()">
             <ng-icon [name]="showPassword() ? 'heroEyeSlash' : 'heroEye'" />
           </button>
         </div>

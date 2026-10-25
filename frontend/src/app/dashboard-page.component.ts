@@ -19,8 +19,8 @@ import { NgIcon } from '@ng-icons/core';
       </div>
       <div class="dashboard-header">
         <select [value]="selectedMes()" (change)="selectedMes.set(+$any($event.target).value); load()">
-          @for (m of [1,2,3,4,5,6,7,8,9,10,11,12]; track m) {
-            <option [value]="m">{{ m }}</option>
+          @for (m of meses; track m.val) {
+            <option [value]="m.val">{{ m.nombre }}</option>
           }
         </select>
         <select [value]="selectedAnio()" (change)="selectedAnio.set(+$any($event.target).value); load()">
@@ -169,6 +169,12 @@ export class DashboardPageComponent implements OnInit {
   selectedDetail = signal<{ title: string; data: Record<string, number> } | null>(null);
   ampliaciones = signal<Array<{ codigo: string; concepto: string; tipo: string; valor: number }>>([]);
   conceptoCode = signal('');
+  meses = [
+    { val: 1, nombre: 'Enero' }, { val: 2, nombre: 'Febrero' }, { val: 3, nombre: 'Marzo' },
+    { val: 4, nombre: 'Abril' }, { val: 5, nombre: 'Mayo' }, { val: 6, nombre: 'Junio' },
+    { val: 7, nombre: 'Julio' }, { val: 8, nombre: 'Agosto' }, { val: 9, nombre: 'Septiembre' },
+    { val: 10, nombre: 'Octubre' }, { val: 11, nombre: 'Noviembre' }, { val: 12, nombre: 'Diciembre' }
+  ];
   selectedMes = signal<number>(new Date().getMonth() + 1);
   selectedAnio = signal<number>(new Date().getFullYear());
   uploadId = signal<number | undefined>(undefined);

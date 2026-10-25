@@ -1,9 +1,11 @@
 import { Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiService } from './services/api.service';
+import { NgIcon } from '@ng-icons/core';
 
 @Component({
   selector: 'app-login',
+  imports: [NgIcon],
   template: `
     <div class="login-container">
       <img src="assets/logo.png" alt="Malvinas Argentinas" class="login-logo" />

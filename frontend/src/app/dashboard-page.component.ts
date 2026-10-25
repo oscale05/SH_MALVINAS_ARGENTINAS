@@ -2,16 +2,17 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { ApiService } from './services/api.service';
 import { BarChartComponent } from './bar-chart.component';
+import { NgIcon } from '@ng-icons/core';
 
 @Component({
   selector: 'app-dashboard-page',
-  imports: [BarChartComponent, DecimalPipe],
+  imports: [BarChartComponent, DecimalPipe, NgIcon],
   template: `
     <section class="dashboard">
       <div class="dashboard-header">
         <h2>Dashboard de Hacienda</h2>
         <button type="button" (click)="load()" [disabled]="loading()" class="btn-primary">
-          {{ loading() ? 'Cargando...' : 'Actualizar' }}
+          <ng-icon name="heroArrowPath" /> {{ loading() ? 'Cargando...' : 'Actualizar' }}
         </button>
       </div>
       @if (error()) { <p class="error">{{ error() }}</p> }

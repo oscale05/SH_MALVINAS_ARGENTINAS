@@ -81,12 +81,6 @@ import { NgIcon } from '@ng-icons/core';
             @if (uploadStatus()) { <p>{{ uploadStatus() }}</p> }
           </div>
           <div class="admin-section">
-            <h4>Cambio de clave</h4>
-            <input [value]="newPassword()" (input)="newPassword.set($any($event.target).value)" placeholder="nueva clave" type="password" />
-            <button type="button" (click)="changePassword()">Cambiar clave</button>
-            @if (passwordStatus()) { <p>{{ passwordStatus() }}</p> }
-          </div>
-          <div class="admin-section">
             <h4>Alta de Tasa</h4>
             <input [value]="newCodigo()" (input)="newCodigo.set($any($event.target).value)" placeholder="Código" />
             <input [value]="newImputacion()" (input)="newImputacion.set($any($event.target).value)" placeholder="Imputación" />
@@ -152,14 +146,12 @@ export class DashboardPageComponent implements OnInit {
   loading = signal(false);
   error = signal('');
   uploadStatus = signal('');
-  passwordStatus = signal('');
   crudStatus = signal('');
   newCodigo = signal('');
   newImputacion = signal('');
   newTotal = signal('');
   deleteCodigo = signal('');
   conceptCodes = signal<Array<{ codigo: string; imputacion: string }>>([]);
-  newPassword = signal('nueva123');
   data = signal<{ rows: number; total: number; origenes: Record<string, number>; ejes: Record<string, number>; secretarias: Record<string, number>; subsecretarias: Record<string, number>; direcciones: Record<string, number>; concurrentes: Record<string, number> } | null>(null);
   selectedDetail = signal<{ title: string; data: Record<string, number> } | null>(null);
   ampliaciones = signal<Array<{ codigo: string; concepto: string; tipo: string; valor: number }>>([]);
@@ -284,10 +276,4 @@ export class DashboardPageComponent implements OnInit {
     });
   }
 
-  changePassword() {
-    this.api.changePassword(this.newPassword()).subscribe({
-      next: () => this.passwordStatus.set('ok'),
-      error: () => this.passwordStatus.set('error')
-    });
-  }
 }

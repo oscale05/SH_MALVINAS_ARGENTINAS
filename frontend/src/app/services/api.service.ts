@@ -90,6 +90,6 @@ export class ApiService {
   }
 
   conceptos() {
-    return this.http.get<{ items: Array<{ codigo: string; origen: string }> }>(`${this.baseUrl}/dashboard/conceptos`);
+    return this.http.get<{ items: Array<{ codigo: string; imputacion: string; origen: string }> }>(`${this.baseUrl}/dashboard/conceptos`);
   }
 }

@@ -444,7 +444,7 @@ $router->get('/dashboard/ampliaciones', fn () => (function () {
 $router->get('/dashboard/conceptos', fn () => (function () {
     header('Content-Type: application/json');
     $pdo = App\Database::connect();
-    $stmt = $pdo->query('SELECT DISTINCT codigo, COALESCE((SELECT nombre FROM origenes WHERE id = ingresos.origen_id), \'SIN ORIGEN\') AS origen FROM ingresos ORDER BY codigo');
+    $stmt = $pdo->query('SELECT DISTINCT codigo, imputacion, COALESCE((SELECT nombre FROM origenes WHERE id = ingresos.origen_id), \'SIN ORIGEN\') AS origen FROM ingresos ORDER BY codigo');
     $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
     echo json_encode(['items' => $items], JSON_THROW_ON_ERROR);
 })());

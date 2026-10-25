@@ -108,7 +108,7 @@ export class CascadeComponent {
   selectedDireccion = signal<string | null>(null);
   selectedConcepto = signal<string | null>(null);
   conceptoCode = signal('');
-  conceptItems = signal<Array<{ codigo: string; origen: string }>>([]);
+  conceptItems = signal<Array<{ codigo: string; imputacion: string; origen: string }>>([]);
   conceptoResult = signal<any>(null);
 
   constructor() {

@@ -95,7 +95,12 @@ import { NgIcon } from '@ng-icons/core';
           </div>
           <div class="admin-section">
             <h4>Baja de Tasa</h4>
-            <input [value]="deleteCodigo()" (input)="deleteCodigo.set($any($event.target).value)" placeholder="Código a eliminar" />
+            <select [value]="deleteCodigo()" (change)="deleteCodigo.set($any($event.target).value)" class="select-full">
+              <option value="">Seleccionar tasa...</option>
+              @for (c of conceptCodes(); track c.codigo) {
+                <option [value]="c.codigo">{{ c.codigo }} - {{ c.imputacion }}</option>
+              }
+            </select>
             <button type="button" (click)="deleteTasa()" class="btn-danger">Eliminar Tasa</button>
           </div>
         </div>
@@ -131,6 +136,7 @@ import { NgIcon } from '@ng-icons/core';
     .cascada-input input { flex: 1; max-width: none; }
     .concepto-result { margin-top: 8px; padding: 8px; background: var(--color-bg); border-radius: var(--radius); }
     .admin-section { margin: 8px 0; display: flex; flex-direction: column; gap: 8px; }
+    .select-full { width: 100%; max-width: 100%; padding: 8px; border: 1px solid var(--color-border); border-radius: var(--radius); }
     @media (max-width: 600px) {
       .dashboard-header { flex-direction: column; align-items: stretch; }
       .dashboard-header button { width: 100%; }
@@ -155,6 +161,7 @@ export class DashboardPageComponent implements OnInit {
   newImputacion = signal('');
   newTotal = signal('');
   deleteCodigo = signal('');
+  conceptCodes = signal<Array<{ codigo: string; imputacion: string }>>([]);
   newPassword = signal('nueva123');
   data = signal<{ rows: number; total: number; origenes: Record<string, number>; ejes: Record<string, number>; secretarias: Record<string, number>; subsecretarias: Record<string, number>; direcciones: Record<string, number>; concurrentes: Record<string, number> } | null>(null);
   selectedDetail = signal<{ title: string; data: Record<string, number> } | null>(null);
@@ -229,6 +236,13 @@ export class DashboardPageComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     this.selectedDate.set(input.value);
     this.load();
+  }
+
+  loadConceptCodes() {
+    this.api.conceptos().subscribe({
+      next: (res) => this.conceptCodes.set(res.items.map((i: any) => ({ codigo: i.codigo, imputacion: i.imputacion }))),
+      error: () => {}
+    });
   }
 
   load() {

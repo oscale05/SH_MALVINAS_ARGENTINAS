@@ -192,7 +192,7 @@ $router->post('/uploads', fn () => (function () {
                 $direccionId = (int) $pdo->lastInsertId();
             }
         }
-        $insert = $pdo->prepare('INSERT INTO ingresos (upload_id, codigo, imputacion, presupuesto, recaudado_fecha_1, recaudado_fecha_2, total, porcentaje_rc, origen_id, eje_id, secretaria_id, subsecretaria_id, direccion_general_id, direccion_id, concurrente_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+        $insert = $pdo->prepare('INSERT INTO ingresos (upload_id, codigo, imputacion, presupuesto, recaudado_fecha_1, recaudado_fecha_2, total, porcentaje_rc, origen_id, eje_id, secretaria_id, subsecretaria_id, direccion_general_id, direccion_id, concurrente_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
         $insert->execute([
             $uploadId,
             (string) ($row['Agrupamiento'] ?? ''),

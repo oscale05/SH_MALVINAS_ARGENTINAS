@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { ApiService } from './services/api.service';
 import { BarChartComponent } from './bar-chart.component';
 
@@ -8,137 +8,43 @@ import { BarChartComponent } from './bar-chart.component';
   template: `
     <section>
       <h2>Dashboard</h2>
-      <button type="button" (click)="checkHealth()">Verificar backend</button>
-      <p>{{ status() }}</p>
-
-      @if (isOperador()) {
-        <input [value]="username()" (input)="username.set($any($event.target).value)" placeholder="usuario" />
-        <input [value]="password()" (input)="password.set($any($event.target).value)" placeholder="clave" type="password" />
-        <button type="button" (click)="login()">Login</button>
-        <button type="button" (click)="logout()">Logout</button>
-        <p>{{ loginStatus() }}</p>
-        <input type="file" (change)="onFileSelected($event)" />
-        <p>{{ uploadStatus() }}</p>
-        <input [value]="newPassword()" (input)="newPassword.set($any($event.target).value)" placeholder="nueva clave" type="password" />
-        <button type="button" (click)="changePassword()">Cambiar clave</button>
-        <p>{{ passwordStatus() }}</p>
+      <button type="button" (click)="load()" [disabled]="loading()">Cargar</button>
+      @if (loading()) { <p>Cargando...</p> }
+      @if (error()) { <p class="error">{{ error() }}</p> }
+      @if (data()) {
+        <p>Filas: {{ data()!.rows }} | Total: {{ data()!.total }}</p>
+        @if (Object.keys(data()!.origenes).length) { <h3>Orígenes</h3> <app-bar-chart [data]="data()!.origenes" /> }
+        @if (Object.keys(data()!.ejes).length) { <h3>Ejes</h3> <app-bar-chart [data]="data()!.ejes" /> }
+        @if (Object.keys(data()!.secretarias).length) { <h3>Secretarías</h3> <app-bar-chart [data]="data()!.secretarias" /> }
+        @if (Object.keys(data()!.subsecretarias).length) { <h3>Subsecretarías</h3> <app-bar-chart [data]="data()!.subsecretarias" /> }
+        @if (Object.keys(data()!.direcciones).length) { <h3>Direcciones</h3> <app-bar-chart [data]="data()!.direcciones" /> }
+        @if (Object.keys(data()!.concurrentes).length) { <h3>Concurrentes</h3> <app-bar-chart [data]="data()!.concurrentes" /> }
       }
-
-      <input [value]="uploadId() ?? ''" (input)="uploadId.set($any($event.target).value ? +$any($event.target).value : undefined)" placeholder="upload_id (opcional)" />
-      <button type="button" (click)="loadMacro()">Cargar macro</button>
-      <p>{{ macroStatus() }}</p>
-      <app-bar-chart [data]="macroData()" />
-
-      <button type="button" (click)="loadCompleto()">Cargar completo</button>
-      <p>{{ completoStatus() }}</p>
-
-      <button type="button" (click)="loadSummary()">Cargar summary</button>
-      <p>{{ summaryStatus() }}</p>
-
-      <button type="button" (click)="loadHealth()">Health full</button>
-      <p>{{ healthStatus() }}</p>
-
-      <a [href]="api.exportCsvUrl(uploadId())" target="_blank">Exportar CSV</a>
     </section>
-  `
+  `,
+  styles: [`.error { color: red; }`]
 })
 export class DashboardPageComponent implements OnInit {
-  api = inject(ApiService);
-  status = signal('sin consultar');
-  uploadStatus = signal('sin cargar');
-  macroStatus = signal('sin datos');
-  macroData = signal<Record<string, number>>({});
-  completoStatus = signal('sin datos');
-  summaryStatus = signal('sin datos');
-  healthStatus = signal('sin datos');
-  loginStatus = signal('sin login');
-  username = signal('operador');
-  password = signal('operador123');
-  uploadId = signal<number | undefined>(undefined);
-  newPassword = signal('nueva123');
-  passwordStatus = signal('sin cambiar');
+  private api = inject(ApiService);
+  loading = signal(false);
+  error = signal('');
+  data = signal<{ rows: number; total: number; origenes: Record<string, number>; ejes: Record<string, number>; secretarias: Record<string, number>; subsecretarias: Record<string, number>; direcciones: Record<string, number>; concurrentes: Record<string, number> } | null>(null);
+  Object = Object;
 
-  isOperador = computed(() => {
-    const token = localStorage.getItem('token');
-    if (!token) return false;
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.role === 'operador';
-    } catch {
-      return false;
-    }
-  });
+  ngOnInit() { this.load(); }
 
-  ngOnInit() { this.loadCompleto(); }
-
-  checkHealth() {
-    this.api.health().subscribe({
-      next: (res) => this.status.set(res.status + ' / ' + res.env),
-      error: () => this.status.set('error')
-    });
-  }
-
-  login() {
-    this.api.login(this.username(), this.password()).subscribe({
-      next: (res) => {
-        localStorage.setItem('token', res.token);
-        this.loginStatus.set('ok');
-      },
-      error: () => this.loginStatus.set('error')
-    });
-  }
-
-  logout() {
-    localStorage.removeItem('token');
-    this.loginStatus.set('logout');
-  }
-
-  onFileSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (!file) return;
-    this.uploadStatus.set('cargando...');
-    this.api.upload(file).subscribe({
-      next: (res) => this.uploadStatus.set(`ok: ${res.rows} filas`),
-      error: () => this.uploadStatus.set('error')
-    });
-  }
-
-  loadMacro() {
-    this.api.macro(this.uploadId()).subscribe({
-      next: (res) => {
-        this.macroStatus.set(JSON.stringify(res.totals_by_origin));
-        this.macroData.set(res.totals_by_origin);
-      },
-      error: () => this.macroStatus.set('error')
-    });
-  }
-
-  loadCompleto() {
+  load() {
+    this.loading.set(true);
+    this.error.set('');
     this.api.completo().subscribe({
-      next: (res) => this.completoStatus.set(`${res.rows} filas / ${res.total}`),
-      error: () => this.completoStatus.set('error')
-    });
-  }
-
-  loadSummary() {
-    this.api.summary().subscribe({
-      next: (res) => this.summaryStatus.set(`${res.uploads} uploads / ${res.users} users / ${res.ingresos} ingresos`),
-      error: () => this.summaryStatus.set('error')
-    });
-  }
-
-  loadHealth() {
-    this.api.healthFull().subscribe({
-      next: (res) => this.healthStatus.set(JSON.stringify(res.checks)),
-      error: () => this.healthStatus.set('error')
-    });
-  }
-
-  changePassword() {
-    this.api.changePassword(this.newPassword()).subscribe({
-      next: () => this.passwordStatus.set('ok'),
-      error: () => this.passwordStatus.set('error')
+      next: (res) => {
+        this.loading.set(false);
+        this.data.set(res);
+      },
+      error: () => {
+        this.loading.set(false);
+        this.error.set('Error al cargar datos');
+      }
     });
   }
 }

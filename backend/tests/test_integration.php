@@ -28,7 +28,7 @@ $token = json_decode($res, true)['token'] ?? '';
 echo "PASS login\n"; $passed++;
 
 // Upload
-$filePath = '/Users/slm/Proyectos/Comerciales/Sistema Hacienda/MAJOR 30092026(OCTUBRE).xlsx';
+$filePath = __DIR__ . '/fixtures/major_sample.xlsx';
 $cfile = new CURLFile($filePath, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'major.xlsx');
 $ch = curl_init("$baseUrl/uploads");
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

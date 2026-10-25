@@ -7,3 +7,6 @@ storage/
 *.docx
 *.xlsx
 imagenes/
+
+# Allow test fixtures
+!backend/tests/fixtures/*.xlsx

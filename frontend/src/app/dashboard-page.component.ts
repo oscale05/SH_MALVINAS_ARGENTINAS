@@ -13,10 +13,6 @@ import { NgIcon } from '@ng-icons/core';
     <section class="dashboard">
       <div class="dashboard-header">
         <h2>Dashboard de Hacienda</h2>
-        <div class="user-bar">
-          <span class="role-badge">{{ 'Administrador' }}</span>
-          <button type="button" class="btn-logout" (click)="logout()">Salir</button>
-        </div>
       </div>
       <div class="dashboard-header">
         <input type="date" [value]="selectedDate()" (change)="onDateChange($event)" class="date-filter" />
@@ -170,11 +166,6 @@ export class DashboardPageComponent implements OnInit {
 
   hasData(obj: Record<string, number>): boolean {
     return Object.keys(obj).length > 0;
-  }
-
-  logout() {
-    localStorage.removeItem('token');
-    window.location.href = '/login';
   }
 
   loadAmpliaciones() {

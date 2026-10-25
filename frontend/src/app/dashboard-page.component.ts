@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { ApiService } from './services/api.service';
 import { BarChartComponent } from './bar-chart.component';
@@ -60,6 +60,11 @@ import { NgIcon } from '@ng-icons/core';
 export class DashboardPageComponent implements OnInit {
   private api = inject(ApiService);
   loading = signal(false);
+  isOperador = computed(() => {
+    const token = localStorage.getItem('token');
+    if (!token) return false;
+    try { return JSON.parse(atob(token.split('.')[1])).role === 'operador'; } catch { return false; }
+  });
   error = signal('');
   data = signal<{ rows: number; total: number; origenes: Record<string, number>; ejes: Record<string, number>; secretarias: Record<string, number>; subsecretarias: Record<string, number>; direcciones: Record<string, number>; concurrentes: Record<string, number> } | null>(null);
 
@@ -67,6 +72,11 @@ export class DashboardPageComponent implements OnInit {
 
   hasData(obj: Record<string, number>): boolean {
     return Object.keys(obj).length > 0;
+  }
+
+  logout() {
+    localStorage.removeItem('token');
+    window.location.href = '/login';
   }
 
   load() {

@@ -86,6 +86,10 @@ import { NgIcon } from '@ng-icons/core';
     .role-badge { background: var(--color-primary); color: white; padding: 2px 10px; border-radius: 12px; font-size: 12px; }
     .btn-logout { background: var(--color-error); padding: 4px 12px; font-size: 12px; }
     .admin-panel { background: var(--color-bg); border-radius: var(--radius); padding: 12px; margin: 12px 0; border: 1px solid var(--color-border); }
+    .cascada-section { margin-top: 16px; padding: 12px; background: var(--color-surface); border-radius: var(--radius); box-shadow: var(--shadow); }
+    .cascada-input { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .cascada-input input { flex: 1; max-width: none; }
+    .concepto-result { margin-top: 8px; padding: 8px; background: var(--color-bg); border-radius: var(--radius); }
     .admin-section { margin: 8px 0; display: flex; flex-direction: column; gap: 8px; }
     @media (max-width: 600px) {
       .dashboard-header { flex-direction: column; align-items: stretch; }
@@ -109,6 +113,8 @@ export class DashboardPageComponent implements OnInit {
   newPassword = signal('nueva123');
   data = signal<{ rows: number; total: number; origenes: Record<string, number>; ejes: Record<string, number>; secretarias: Record<string, number>; subsecretarias: Record<string, number>; direcciones: Record<string, number>; concurrentes: Record<string, number> } | null>(null);
   ampliaciones = signal<Array<{ codigo: string; concepto: string; tipo: string; valor: number }>>([]);
+  conceptoCode = signal('');
+  conceptoResult = signal<any>(null);
 
   isOperador = computed(() => {
     const token = localStorage.getItem('token');
@@ -131,6 +137,15 @@ export class DashboardPageComponent implements OnInit {
     this.api.ampliaciones().subscribe({
       next: (res) => this.ampliaciones.set(res.ampliaciones),
       error: () => {}
+    });
+  }
+
+  lookupConcepto() {
+    const code = this.conceptoCode();
+    if (!code) return;
+    this.api.concepto(code).subscribe({
+      next: (res) => this.conceptoResult.set(res),
+      error: () => this.conceptoResult.set({ error: 'No encontrado' })
     });
   }
 

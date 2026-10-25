@@ -3,7 +3,21 @@
     <span class="brand-text">Secretaría de Hacienda</span>
     <nav>
       <a routerLink="/">Dashboard</a>
-      <a routerLink="/login">Login</a>
+      @if (isLoggedIn) {
+        <div class="user-menu">
+          <button type="button" class="avatar-btn" (click)="toggleMenu()">
+            <span class="avatar">{{ username.charAt(0).toUpperCase() }}</span>
+            <span class="user-name">{{ username }}</span>
+          </button>
+          @if (menuOpen()) {
+            <div class="dropdown">
+              <button type="button" (click)="logout()">Cerrar sesión</button>
+            </div>
+          }
+        </div>
+      } @else {
+        <a routerLink="/login">Login</a>
+      }
     </nav>
   </header>
   <main class="app-main">

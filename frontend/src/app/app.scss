@@ -26,3 +26,28 @@
   .app-header nav a { margin-left: 8px; font-size: 14px; }
   .app-main { padding: 8px; }
 }
+
+.user-menu { position: relative; display: inline-block; }
+.avatar-btn {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+  padding: 4px 12px; border-radius: 20px; color: white; cursor: pointer;
+}
+.avatar-btn:hover { background: rgba(255,255,255,0.25); }
+.avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--color-secondary); color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 14px;
+}
+.user-name { font-size: 14px; }
+.dropdown {
+  position: absolute; right: 0; top: 100%; margin-top: 4px;
+  background: white; border-radius: var(--radius); box-shadow: var(--shadow);
+  min-width: 140px; overflow: hidden; z-index: 100;
+}
+.dropdown button {
+  width: 100%; background: white; color: var(--color-text);
+  border: none; padding: 10px 16px; text-align: left; border-radius: 0;
+}
+.dropdown button:hover { background: var(--color-bg); }

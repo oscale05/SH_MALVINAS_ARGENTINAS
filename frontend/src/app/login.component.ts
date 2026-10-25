@@ -33,8 +33,8 @@ import { NgIcon } from '@ng-icons/core';
 export class LoginComponent {
   private api = inject(ApiService);
   private router = inject(Router);
-  username = signal('operador');
-  password = signal('operador123');
+  username = signal('administrador');
+  password = signal('administrador123');
   status = signal('sin login');
 
   login() {

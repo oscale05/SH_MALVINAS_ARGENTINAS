@@ -2,7 +2,7 @@ CREATE TABLE users (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(100) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
-    role ENUM('operador','observador') NOT NULL,
+    role ENUM('administrador') NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -81,7 +81,7 @@ CREATE TABLE concurrentes (
     nombre VARCHAR(150) NOT NULL UNIQUE
 );
 
-INSERT INTO users (username, password_hash, role) VALUES ('operador', '$2y$12$z.NEHC0GxW7b5A86wO4o7OwQeACLfqlFJ.xKP6Y7QuZ1GAAvbaD1K', 'operador');
+INSERT INTO users (username, password_hash, role) VALUES ('administrador', '$2y$12$z.NEHC0GxW7b5A86wO4o7OwQeACLfqlFJ.xKP6Y7QuZ1GAAvbaD1K', 'administrador');
 
 CREATE TABLE ampliaciones (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,

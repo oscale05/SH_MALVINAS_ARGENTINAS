@@ -30,22 +30,17 @@ if ($code === 200) { echo "PASS version\n"; $passed++; } else { echo "FAIL versi
 if ($code === 200) { echo "PASS health/full\n"; $passed++; } else { echo "FAIL health/full: $code\n"; $failed++; }
 
 // Login valid
-[$code, $res] = req('POST', "$baseUrl/auth/login", ['Content-Type: application/json'], json_encode(['username' => 'operador', 'password' => 'operador123']));
+[$code, $res] = req('POST', "$baseUrl/auth/login", ['Content-Type: application/json'], json_encode(['username' => 'administrador', 'password' => 'administrador123']));
 if ($code === 200) { echo "PASS login valid\n"; $passed++; } else { echo "FAIL login valid: $code\n"; $failed++; }
 $token = json_decode($res, true)['token'] ?? '';
 
 // Login invalid
-[$code, $res] = req('POST', "$baseUrl/auth/login", ['Content-Type: application/json'], json_encode(['username' => 'operador', 'password' => 'wrong']));
+[$code, $res] = req('POST', "$baseUrl/auth/login", ['Content-Type: application/json'], json_encode(['username' => 'administrador', 'password' => 'wrong']));
 if ($code === 401) { echo "PASS login invalid\n"; $passed++; } else { echo "FAIL login invalid: $code\n"; $failed++; }
 
-// Users (operador)
+// Users (administrador)
 [$code, $res] = req('GET', "$baseUrl/users", ["Authorization: Bearer $token"]);
 if ($code === 200) { echo "PASS users\n"; $passed++; } else { echo "FAIL users: $code\n"; $failed++; }
-
-// Users (observador -> 403)
-$obToken = json_decode(req('POST', "$baseUrl/auth/login", ['Content-Type: application/json'], json_encode(['username' => 'observador', 'password' => 'observador123']))[1], true)['token'] ?? '';
-[$code, $res] = req('GET', "$baseUrl/users", ["Authorization: Bearer $obToken"]);
-if ($code === 403) { echo "PASS users forbidden\n"; $passed++; } else { echo "FAIL users forbidden: $code\n"; $failed++; }
 
 // Uploads list
 [$code, $res] = req('GET', "$baseUrl/uploads");

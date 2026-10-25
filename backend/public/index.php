@@ -54,7 +54,7 @@ $router->post('/uploads', fn () => (function () {
     $auth = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
     $token = str_replace('Bearer ', '', $auth);
     $payload = App\Auth::verify($token);
-    if (!is_array($payload) || ($payload['role'] ?? '') !== 'operador') {
+    if (!is_array($payload) || ($payload['role'] ?? '') !== 'administrador') {
         http_response_code(403);
         echo json_encode(['error' => 'Sin permiso'], JSON_THROW_ON_ERROR);
         return;
@@ -87,8 +87,11 @@ $router->post('/uploads', fn () => (function () {
     file_put_contents(__DIR__ . '/../storage/last_upload.json', json_encode($rows, JSON_THROW_ON_ERROR));
 
     $pdo = App\Database::connect();
-    $stmt = $pdo->prepare('INSERT INTO uploads (filename, uploaded_by, status) VALUES (?, 1, ?)');
-    $stmt->execute([basename($target), 'processed']);
+    $userStmt = $pdo->prepare('SELECT id FROM users WHERE username = ?');
+    $userStmt->execute([(string)($payload['sub'] ?? 'administrador')]);
+    $userId = (int) $userStmt->fetchColumn() ?: 1;
+    $stmt = $pdo->prepare('INSERT INTO uploads (filename, uploaded_by, status) VALUES (?, ?, ?)');
+    $stmt->execute([basename($target), $userId, 'processed']);
     $uploadId = (int) $pdo->lastInsertId();
 
     foreach ($rows as $row) {
@@ -376,7 +379,7 @@ $router->get('/users', fn () => (function () {
     $auth = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
     $token = str_replace('Bearer ', '', $auth);
     $payload = App\Auth::verify($token);
-    if (!is_array($payload) || ($payload['role'] ?? '') !== 'operador') {
+    if (!is_array($payload) || ($payload['role'] ?? '') !== 'administrador') {
         http_response_code(403);
         echo json_encode(['error' => 'Sin permiso'], JSON_THROW_ON_ERROR);
         return;

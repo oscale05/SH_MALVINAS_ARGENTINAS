@@ -6,7 +6,7 @@
       @if (isLoggedIn) {
         <div class="user-menu">
           <button type="button" class="avatar-btn" (click)="toggleMenu()">
-            <ng-icon [name]="username === 'operador' ? 'heroShieldCheck' : 'heroUserCircle'" class="avatar-icon" />
+            <ng-icon [name]="username === 'administrador' ? 'heroShieldCheck' : 'heroUserCircle'" class="avatar-icon" />
             <span class="user-name">{{ username }}</span>
           </button>
           @if (menuOpen()) {

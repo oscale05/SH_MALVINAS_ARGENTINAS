@@ -22,7 +22,7 @@ function request(string $method, string $url, ?array $headers = null, $body = nu
 if ($code !== 200) { echo "FAIL health: HTTP $code\n"; $failed++; } else { echo "PASS health\n"; $passed++; }
 
 // Login
-[$code, $res] = request('POST', "$baseUrl/auth/login", ['Content-Type: application/json'], json_encode(['username' => 'operador', 'password' => 'operador123']));
+[$code, $res] = request('POST', "$baseUrl/auth/login", ['Content-Type: application/json'], json_encode(['username' => 'administrador', 'password' => 'administrador123']));
 if ($code !== 200) { echo "FAIL login: HTTP $code\n"; $failed++; exit(1); }
 $token = json_decode($res, true)['token'] ?? '';
 echo "PASS login\n"; $passed++;

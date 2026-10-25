@@ -13,7 +13,7 @@ import { NgIcon } from '@ng-icons/core';
       <div class="dashboard-header">
         <h2>Dashboard de Hacienda</h2>
         <div class="user-bar">
-          <span class="role-badge">{{ isOperador() ? 'Operador' : 'Observador' }}</span>
+          <span class="role-badge">{{ 'Administrador' }}</span>
           <button type="button" class="btn-logout" (click)="logout()">Salir</button>
         </div>
       </div>
@@ -54,7 +54,7 @@ import { NgIcon } from '@ng-icons/core';
         }
       }
 
-      @if (isOperador()) {
+      @if (isAdministrador()) {
         <div class="admin-panel">
           <h3>Administración</h3>
           <div class="admin-section">
@@ -118,10 +118,10 @@ export class DashboardPageComponent implements OnInit {
   conceptoCode = signal('');
   conceptoResult = signal<any>(null);
 
-  isOperador = computed(() => {
+  isAdministrador = computed(() => {
     const token = localStorage.getItem('token');
     if (!token) return false;
-    try { return JSON.parse(atob(token.split('.')[1])).role === 'operador'; } catch { return false; }
+    try { return JSON.parse(atob(token.split('.')[1])).role === 'administrador'; } catch { return false; }
   });
 
   ngOnInit() { this.load(); this.loadAmpliaciones(); }

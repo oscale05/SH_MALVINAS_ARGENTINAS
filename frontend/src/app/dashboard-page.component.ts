@@ -209,8 +209,11 @@ export class DashboardPageComponent implements OnInit {
   }
 
   deleteTasa() {
-    this.api.deleteTasa(this.deleteCodigo()).subscribe({
-      next: () => { this.crudStatus.set('Tasa eliminada'); this.load(); },
+    const codigo = this.deleteCodigo();
+    if (!codigo) return;
+    if (!confirm(`¿Está seguro de eliminar la tasa ${codigo}?`)) return;
+    this.api.deleteTasa(codigo).subscribe({
+      next: () => { this.crudStatus.set('Tasa eliminada'); this.load(); this.loadConceptCodes(); },
       error: () => this.crudStatus.set('Error al eliminar')
     });
   }

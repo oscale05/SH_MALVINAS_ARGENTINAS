@@ -3,13 +3,27 @@ on: [push, pull_request]
 jobs:
   backend:
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: hacienda
+          MYSQL_USER: hacienda
+          MYSQL_PASSWORD: hacienda
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
     steps:
       - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y default-mysql-client
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
           extensions: pdo_mysql, zip
       - run: cd backend && find . -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Import schema
+        run: mysql -h 127.0.0.1 -u hacienda -phacienda hacienda < backend/database/migrations/001_initial.sql
       - run: cd backend && php tests/test_xlsx_parser.php
       - run: cd backend && php tests/test_auth.php
   frontend:

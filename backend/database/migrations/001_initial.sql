@@ -80,3 +80,5 @@ CREATE TABLE concurrentes (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(150) NOT NULL UNIQUE
 );
+
+INSERT INTO users (username, password_hash, role) VALUES ('operador', '$2y$12$z.NEHC0GxW7b5A86wO4o7OwQeACLfqlFJ.xKP6Y7QuZ1GAAvbaD1K', 'operador');

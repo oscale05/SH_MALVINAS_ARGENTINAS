@@ -30,13 +30,13 @@
       <div class="modal-content" (click)="$event.stopPropagation()">
         <h3>Cambiar clave</h3>
         <div class="modal-field">
-          <input [type]="showPassword() ? 'text' : 'password'" [value]="newPassword()" (input)="newPassword.set($any($event.target).value)" placeholder="Nueva clave" />
+          <input [type]="showPassword() ? 'text' : 'password'" [value]="newPassword()" (input)="newPassword.set($any($event.target).value)" placeholder="Nueva clave" autofocus (click)="$event.stopPropagation()" />
           <button type="button" class="eye-btn" (click)="toggleShowPassword()">
             <ng-icon [name]="showPassword() ? 'heroEyeSlash' : 'heroEye'" />
           </button>
         </div>
         <div class="modal-field">
-          <input [type]="showPassword() ? 'text' : 'password'" [value]="confirmPassword()" (input)="confirmPassword.set($any($event.target).value)" placeholder="Confirmar clave" />
+          <input [type]="showPassword() ? 'text' : 'password'" [value]="confirmPassword()" (input)="confirmPassword.set($any($event.target).value)" placeholder="Confirmar clave" (click)="$event.stopPropagation()" />
         </div>
         @if (passwordStatus()) {
           <p [class.error]="passwordStatus() !== 'ok'">{{ passwordStatus() === 'ok' ? 'Clave cambiada correctamente' : passwordStatus() }}</p>

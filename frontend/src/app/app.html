@@ -2,17 +2,15 @@
   <header class="app-header">
     <span class="brand-text">Secretaría de Hacienda</span>
     <nav>
-      <a routerLink="/">Dashboard</a>
+      <a routerLink="/" class="nav-dashboard">Dashboard</a>
       @if (isLoggedIn) {
         <div class="user-menu">
           <button type="button" class="avatar-btn" (click)="toggleMenu()">
             <ng-icon [name]="isAdmin ? 'heroShieldCheck' : 'heroUserCircle'" class="avatar-icon" />
-            <span class="user-name">{{ username }}</span>
           </button>
           @if (menuOpen()) {
             <div class="dropdown">
               <button type="button" (click)="openPasswordModal()">Cambiar clave</button>
-              <button type="button" (click)="logout()">Cerrar sesión</button>
             </div>
           }
         </div>
@@ -30,7 +28,7 @@
       <div class="modal-content" (click)="$event.stopPropagation()">
         <h3>Cambiar clave</h3>
         <div class="modal-field">
-          <input #newPwdInput [type]="showPassword() ? 'text' : 'password'" [value]="newPassword()" (input)="newPassword.set($any($event.target).value)" placeholder="Nueva clave" (click)="$event.stopPropagation()" />
+          <input #newPwdInput [type]="showPassword() ? 'text' : 'password'" [value]="newPassword()" (input)="newPassword.set($any($event.target).value)" placeholder="Nueva clave" autofocus (click)="$event.stopPropagation()" />
           <button type="button" class="eye-btn" (click)="toggleShowPassword(); $event.stopPropagation()" (mousedown)="$event.preventDefault()">
             <ng-icon [name]="showPassword() ? 'heroEyeSlash' : 'heroEye'" />
           </button>

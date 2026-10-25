@@ -42,6 +42,14 @@ import { NgIcon } from '@ng-icons/core';
           @if (hasData(data()!.direcciones)) { <div class="chart-card"><h3>Direcciones</h3><app-bar-chart [data]="data()!.direcciones" /></div> }
           @if (hasData(data()!.concurrentes)) { <div class="chart-card"><h3>Concurrentes</h3><app-bar-chart [data]="data()!.concurrentes" /></div> }
         </div>
+        @if (ampliaciones().length > 0) {
+          <div class="chart-card">
+            <h3>Ampliaciones de Presupuesto</h3>
+            @for (a of ampliaciones(); track a.codigo) {
+              <p>{{ a.codigo }} - {{ a.concepto }}: {{ a.valor }} ({{ a.tipo }})</p>
+            }
+          </div>
+        }
       }
 
       @if (isOperador()) {
@@ -100,6 +108,7 @@ export class DashboardPageComponent implements OnInit {
   passwordStatus = signal('');
   newPassword = signal('nueva123');
   data = signal<{ rows: number; total: number; origenes: Record<string, number>; ejes: Record<string, number>; secretarias: Record<string, number>; subsecretarias: Record<string, number>; direcciones: Record<string, number>; concurrentes: Record<string, number> } | null>(null);
+  ampliaciones = signal<Array<{ codigo: string; concepto: string; tipo: string; valor: number }>>([]);
 
   isOperador = computed(() => {
     const token = localStorage.getItem('token');
@@ -107,7 +116,7 @@ export class DashboardPageComponent implements OnInit {
     try { return JSON.parse(atob(token.split('.')[1])).role === 'operador'; } catch { return false; }
   });
 
-  ngOnInit() { this.load(); }
+  ngOnInit() { this.load(); this.loadAmpliaciones(); }
 
   hasData(obj: Record<string, number>): boolean {
     return Object.keys(obj).length > 0;
@@ -116,6 +125,13 @@ export class DashboardPageComponent implements OnInit {
   logout() {
     localStorage.removeItem('token');
     window.location.href = '/login';
+  }
+
+  loadAmpliaciones() {
+    this.api.ampliaciones().subscribe({
+      next: (res) => this.ampliaciones.set(res.ampliaciones),
+      error: () => {}
+    });
   }
 
   load() {

@@ -82,3 +82,14 @@ CREATE TABLE concurrentes (
 );
 
 INSERT INTO users (username, password_hash, role) VALUES ('operador', '$2y$12$z.NEHC0GxW7b5A86wO4o7OwQeACLfqlFJ.xKP6Y7QuZ1GAAvbaD1K', 'operador');
+
+CREATE TABLE ampliaciones (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    upload_id BIGINT UNSIGNED NOT NULL,
+    codigo VARCHAR(50) NOT NULL,
+    concepto VARCHAR(255) NOT NULL,
+    tipo ENUM('AMPLIACION','PARTIDA_NUEVA') NOT NULL,
+    valor DECIMAL(18,2) NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (upload_id) REFERENCES uploads(id)
+);

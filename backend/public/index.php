@@ -93,6 +93,9 @@ $router->post('/uploads', fn () => (function () {
 
     foreach ($rows as $row) {
         $originName = trim((string) ($row['ORIGEN'] ?? ''));
+        if ($originName === '') {
+            $originName = 'FONDOS AFECTADOS';
+        }
         $originId = null;
         if ($originName !== '') {
             $find = $pdo->prepare('SELECT id FROM origenes WHERE nombre = ?');
@@ -423,6 +426,13 @@ $router->get('/dashboard/concurrentes', fn () => (function () {
         $totals[$row['concurrentes']] = (float) $row['total'];
     }
     echo json_encode(['rows' => $rows, 'totals_by_concurrentes' => $totals], JSON_THROW_ON_ERROR);
+})());
+
+$router->get('/dashboard/ampliaciones', fn () => (function () {
+    header('Content-Type: application/json');
+    $pdo = App\Database::connect();
+    $stmt = $pdo->query('SELECT * FROM ampliaciones ORDER BY id DESC');
+    echo json_encode(['ampliaciones' => $stmt->fetchAll()], JSON_THROW_ON_ERROR);
 })());
 
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';

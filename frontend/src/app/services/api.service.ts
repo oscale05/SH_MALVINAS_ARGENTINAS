@@ -54,6 +54,10 @@ export class ApiService {
     return this.http.get<{ rows: number; total: number; origenes: Record<string, number>; ejes: Record<string, number>; secretarias: Record<string, number>; subsecretarias: Record<string, number>; direcciones: Record<string, number>; concurrentes: Record<string, number> }>(`${this.baseUrl}/dashboard/completo`);
   }
 
+  ampliaciones() {
+    return this.http.get<{ ampliaciones: Array<{ id: number; codigo: string; concepto: string; tipo: string; valor: number }> }>(`${this.baseUrl}/dashboard/ampliaciones`);
+  }
+
   changePassword(password: string) {
     const token = localStorage.getItem('token') || '';
     return this.http.post<{ status: string }>(`${this.baseUrl}/auth/change-password`, { password }, {

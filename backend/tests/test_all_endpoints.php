@@ -59,9 +59,11 @@ foreach (['macro', 'eje', 'secretaria', 'resumen', 'completo', 'summary'] as $ep
 
 // Concurrentes
 [$code, $res] = req('GET', "$baseUrl/dashboard/concurrentes");
-if ($code === 200) { echo "PASS dashboard/concurrentes
-"; $passed++; } else { echo "FAIL dashboard/concurrentes: $code
-"; $failed++; }
+if ($code === 200) { echo "PASS dashboard/concurrentes\n"; $passed++; } else { echo "FAIL dashboard/concurrentes: $code\n"; $failed++; }
+
+// Ampliaciones
+[$code, $res] = req('GET', "$baseUrl/dashboard/ampliaciones");
+if ($code === 200) { echo "PASS dashboard/ampliaciones\n"; $passed++; } else { echo "FAIL dashboard/ampliaciones: $code\n"; $failed++; }
 
 // Concepto
 [$code, $res] = req('GET', "$baseUrl/dashboard/concepto?codigo=1.1.4.01");

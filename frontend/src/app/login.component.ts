@@ -5,14 +5,23 @@ import { ApiService } from './services/api.service';
 @Component({
   selector: 'app-login',
   template: `
-    <section>
-      <h2>Login</h2>
-      <input [value]="username()" (input)="username.set($any($event.target).value)" placeholder="usuario" />
-      <input [value]="password()" (input)="password.set($any($event.target).value)" placeholder="clave" type="password" />
-      <button type="button" (click)="login()">Entrar</button>
-      <p>{{ status() }}</p>
-    </section>
-  `
+    <div class="login-container">
+      <img src="assets/logo.png" alt="Malvinas Argentinas" class="login-logo" />
+      <h2>Ingreso al Sistema</h2>
+      <div class="login-form">
+        <input [value]="username()" (input)="username.set($any($event.target).value)" placeholder="Usuario" />
+        <input [value]="password()" (input)="password.set($any($event.target).value)" placeholder="Clave" type="password" />
+        <button type="button" (click)="login()">Ingresar</button>
+        <p [class.error]="status() === 'error'">{{ status() }}</p>
+      </div>
+    </div>
+  `,
+  styles: [`
+    .login-container { max-width: 400px; margin: 40px auto; text-align: center; }
+    .login-logo { height: 80px; margin-bottom: 16px; }
+    .login-form { display: flex; flex-direction: column; gap: 12px; align-items: center; margin-top: 16px; }
+    .login-form input { max-width: 100%; }
+  `]
 })
 export class LoginComponent {
   private api = inject(ApiService);

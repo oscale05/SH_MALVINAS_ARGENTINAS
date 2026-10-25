@@ -10,3 +10,4 @@ imagenes/
 
 # Allow test fixtures
 !backend/tests/fixtures/*.xlsx
+.DS_Store

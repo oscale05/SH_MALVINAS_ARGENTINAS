@@ -1,1 +1,65 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  --color-primary: #324687;
+  --color-primary-dark: #2a3a70;
+  --color-primary-light: #4a5fa0;
+  --color-secondary: #55a53c;
+  --color-secondary-dark: #468a31;
+  --color-dark: #373c5f;
+  --color-light: #808cb3;
+  --color-bg: #f5f6fa;
+  --color-surface: #ffffff;
+  --color-text: #1f2937;
+  --color-text-muted: #6b7280;
+  --color-border: #e5e7eb;
+  --color-error: #dc2626;
+  --color-warning: #f59e0b;
+  --radius: 8px;
+  --shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+h1, h2, h3 { color: var(--color-primary); margin-bottom: 0.5rem; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.1rem; margin-top: 1rem; }
+
+button {
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+button:hover { background: var(--color-primary-dark); }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+input {
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-size: 14px;
+  width: 100%;
+  max-width: 300px;
+}
+input:focus { outline: none; border-color: var(--color-primary); }
+
+.error { color: var(--color-error); }
+.loading { color: var(--color-text-muted); font-style: italic; }
+
+.card {
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px;
+  margin: 8px 0;
+}

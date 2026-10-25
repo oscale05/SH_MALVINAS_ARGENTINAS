@@ -2,15 +2,16 @@
   <header class="app-header">
     <span class="brand-text">Secretaría de Hacienda</span>
     <nav>
-      <a routerLink="/"><ng-icon name="heroChartBar" /> Dashboard</a>
+      <a routerLink="/">Dashboard</a>
       @if (isLoggedIn) {
         <div class="user-menu">
           <button type="button" class="avatar-btn" (click)="toggleMenu()">
-            <ng-icon [name]="username === 'administrador' ? 'heroShieldCheck' : 'heroUserCircle'" class="avatar-icon" />
+            <ng-icon [name]="isAdmin ? 'heroShieldCheck' : 'heroUserCircle'" class="avatar-icon" />
             <span class="user-name">{{ username }}</span>
           </button>
           @if (menuOpen()) {
             <div class="dropdown">
+              <button type="button" (click)="openPasswordModal()">Cambiar clave</button>
               <button type="button" (click)="logout()">Cerrar sesión</button>
             </div>
           }
@@ -23,4 +24,28 @@
   <main class="app-main">
     <router-outlet />
   </main>
+
+  @if (showPasswordModal()) {
+    <div class="modal-overlay" (click)="closePasswordModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <h3>Cambiar clave</h3>
+        <div class="modal-field">
+          <input [type]="showPassword() ? 'text' : 'password'" [value]="newPassword()" (input)="newPassword.set($any($event.target).value)" placeholder="Nueva clave" />
+          <button type="button" class="eye-btn" (click)="toggleShowPassword()">
+            <ng-icon [name]="showPassword() ? 'heroEyeSlash' : 'heroEye'" />
+          </button>
+        </div>
+        <div class="modal-field">
+          <input [type]="showPassword() ? 'text' : 'password'" [value]="confirmPassword()" (input)="confirmPassword.set($any($event.target).value)" placeholder="Confirmar clave" />
+        </div>
+        @if (passwordStatus()) {
+          <p [class.error]="passwordStatus() !== 'ok'">{{ passwordStatus() === 'ok' ? 'Clave cambiada correctamente' : passwordStatus() }}</p>
+        }
+        <div class="modal-actions">
+          <button type="button" (click)="changePassword()">Guardar</button>
+          <button type="button" class="btn-secondary" (click)="closePasswordModal()">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  }
 </div>

@@ -18,16 +18,7 @@ import { NgIcon } from '@ng-icons/core';
         </div>
       </div>
       <div class="dashboard-header">
-        <select [value]="selectedMes()" (change)="selectedMes.set(+$any($event.target).value); load()">
-          @for (m of meses; track m.val) {
-            <option [value]="m.val">{{ m.nombre }}</option>
-          }
-        </select>
-        <select [value]="selectedAnio()" (change)="selectedAnio.set(+$any($event.target).value); load()">
-          @for (a of [2024,2025,2026]; track a) {
-            <option [value]="a">{{ a }}</option>
-          }
-        </select>
+        <input type="date" [value]="selectedDate()" (change)="onDateChange($event)" class="date-filter" />
         <button type="button" (click)="load()" [disabled]="loading()" class="btn-primary">
           <ng-icon name="heroArrowPath" /> {{ loading() ? 'Cargando...' : 'Actualizar' }}
         </button>
@@ -169,14 +160,7 @@ export class DashboardPageComponent implements OnInit {
   selectedDetail = signal<{ title: string; data: Record<string, number> } | null>(null);
   ampliaciones = signal<Array<{ codigo: string; concepto: string; tipo: string; valor: number }>>([]);
   conceptoCode = signal('');
-  meses = [
-    { val: 1, nombre: 'Enero' }, { val: 2, nombre: 'Febrero' }, { val: 3, nombre: 'Marzo' },
-    { val: 4, nombre: 'Abril' }, { val: 5, nombre: 'Mayo' }, { val: 6, nombre: 'Junio' },
-    { val: 7, nombre: 'Julio' }, { val: 8, nombre: 'Agosto' }, { val: 9, nombre: 'Septiembre' },
-    { val: 10, nombre: 'Octubre' }, { val: 11, nombre: 'Noviembre' }, { val: 12, nombre: 'Diciembre' }
-  ];
-  selectedMes = signal<number>(new Date().getMonth() + 1);
-  selectedAnio = signal<number>(new Date().getFullYear());
+  selectedDate = signal<string>(new Date().toISOString().split('T')[0]);
   uploadId = signal<number | undefined>(undefined);
   conceptoResult = signal<any>(null);
 
@@ -241,10 +225,19 @@ export class DashboardPageComponent implements OnInit {
     return Object.entries(d.data).map(([key, value]) => ({ key, value })).sort((a, b) => b.value - a.value);
   }
 
+  onDateChange(event: Event) {
+    const input = event.target as HTMLInputElement;
+    this.selectedDate.set(input.value);
+    this.load();
+  }
+
   load() {
     this.loading.set(true);
     this.error.set('');
-    this.api.macro(undefined, this.selectedMes(), this.selectedAnio()).subscribe({
+    const d = new Date(this.selectedDate());
+    const mes = d.getMonth() + 1;
+    const anio = d.getFullYear();
+    this.api.macro(undefined, mes, anio).subscribe({
       next: (res) => {
         this.loading.set(false);
         this.data.set({ rows: res.rows, total: res.total, origenes: res.totals_by_origin, ejes: {}, secretarias: {}, subsecretarias: {}, direcciones: {}, concurrentes: {} });

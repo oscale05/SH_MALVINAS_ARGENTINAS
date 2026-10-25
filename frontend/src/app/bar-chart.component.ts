@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, computed, Input, OnChanges, signal } from "@angular/core";
 
 @Component({
   selector: 'app-bar-chart',
@@ -15,9 +15,9 @@ import { Component, Input, OnChanges } from '@angular/core';
                   [attr.d]="item.path"
                   [attr.fill]="colors[i % colors.length]"
                   class="pie-slice"
-                  (mouseenter)="hovered = i"
-                  (mouseleave)="hovered = -1"
-                  (click)="selected = selected === i ? -1 : i"
+                  (mouseenter)="hovered.set(i)"
+                  (mouseleave)="hovered.set(-1)"
+                  (click)="selected.set(selected() === i ? -1 : i)"
                 />
               }
               <text [attr.x]="size/2" [attr.y]="size/2 - 6" text-anchor="middle" font-size="12" fill="#374151" font-weight="600">{{ totalLabel }}</text>
@@ -26,7 +26,7 @@ import { Component, Input, OnChanges } from '@angular/core';
           </div>
           <div class="pie-legend">
             @for (item of items; track item.label; let i = $index) {
-              <div class="legend-item" (mouseenter)="hovered = i" (mouseleave)="hovered = -1" (click)="selected = selected === i ? -1 : i">
+              <div class="legend-item" (mouseenter)="hovered.set(i)" (mouseleave)="hovered.set(-1)" (click)="selected.set(selected() === i ? -1 : i)">
                 <span class="legend-color" [style.background]="colors[i % colors.length]"></span>
                 <span class="legend-label">{{ item.label }}</span>
                 <span class="legend-value">{{ formatValue(item.value) }} ({{ item.percent }}%)</span>
@@ -58,17 +58,15 @@ export class BarChartComponent implements OnChanges {
   size = 200;
   colors = ['#174b65', '#1a5977', '#1c688a', '#1d779d', '#1d87b0', '#1b97c3', '#18a7d7', '#10b8eb', '#00c9ff'];
 
-  hovered = -1;
-  selected = -1;
+  hovered = signal(-1);
+  selected = signal(-1);
 
   items: { label: string; value: number; percent: string; path: string }[] = [];
   total = 0;
   totalLabel = '';
   totalValue = '';
 
-  get activeIndex(): number {
-    return this.selected >= 0 ? this.selected : this.hovered;
-  }
+  activeIndex = computed(() => this.selected() >= 0 ? this.selected() : this.hovered());
 
   ngOnChanges() {
     this.computeItems();

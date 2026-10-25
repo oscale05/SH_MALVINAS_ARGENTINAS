@@ -41,10 +41,10 @@ import { Component, Input, OnChanges, signal, computed } from '@angular/core';
     .bar:hover { opacity: 0.75; }
     .no-data { color: #6b7280; font-style: italic; font-size: 14px; padding: 16px; }
     .tooltip {
-      position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+      position: absolute; top: 4px; right: 4px;
       background: rgba(51, 65, 85, 0.95); color: white;
       padding: 6px 14px; border-radius: 6px; font-size: 12px;
-      display: flex; flex-direction: column; gap: 2px; align-items: center;
+      display: flex; flex-direction: column; gap: 2px; align-items: flex-end;
       pointer-events: none; z-index: 10; white-space: nowrap;
       box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     }

@@ -26,17 +26,7 @@ jobs:
           extensions: pdo_mysql, zip
       - name: Create .env
         run: |
-          cat > backend/.env <<EOF
-APP_NAME=Hacienda
-APP_ENV=testing
-APP_PORT=8099
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=hacienda
-DB_USERNAME=hacienda
-DB_PASSWORD=hacienda
-JWT_SECRET=ci-test-secret
-EOF
+          printf 'APP_NAME=Hacienda\nAPP_ENV=testing\nAPP_PORT=8099\nDB_HOST=127.0.0.1\nDB_PORT=3306\nDB_DATABASE=hacienda\nDB_USERNAME=hacienda\nDB_PASSWORD=hacienda\nJWT_SECRET=ci-test-secret\n' > backend/.env
       - name: Run migrations
         run: |
           mysql -h 127.0.0.1 -u hacienda -phacienda hacienda < backend/database/migrations/001_initial.sql

@@ -52,6 +52,7 @@ import { NgIcon } from '@ng-icons/core';
                     <tr><td>{{ item.key }}</td><td>{{ item.value | number:'1.2-2' }}</td></tr>
                   }
                 </tbody>
+                <tfoot><tr><td><strong>Total</strong></td><td><strong>{{ detailTotal() | number:'1.2-2' }}</strong></td></tr></tfoot>
               </table>
               <button type="button" (click)="closeDetail()">Cerrar</button>
             </div>
@@ -213,6 +214,12 @@ export class DashboardPageComponent implements OnInit {
     const d = this.selectedDetail();
     if (!d) return [];
     return Object.entries(d.data).map(([key, value]) => ({ key, value })).sort((a, b) => b.value - a.value);
+  }
+
+  detailTotal(): number {
+    const d = this.selectedDetail();
+    if (!d) return 0;
+    return Object.values(d.data).reduce((sum, v) => sum + v, 0);
   }
 
   onDateChange(event: Event) {

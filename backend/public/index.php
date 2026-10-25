@@ -452,6 +452,75 @@ $router->get('/dashboard/conceptos', fn () => (function () {
     echo json_encode(['items' => $items], JSON_THROW_ON_ERROR);
 })());
 
+
+$router->post('/tasas', fn () => (function () {
+    header('Content-Type: application/json');
+    $auth = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+    $token = str_replace('Bearer ', '', $auth);
+    $payload = App\Auth::verify($token);
+    if (!is_array($payload) || ($payload['role'] ?? '') !== 'administrador') {
+        http_response_code(403);
+        echo json_encode(['error' => 'Sin permiso'], JSON_THROW_ON_ERROR);
+        return;
+    }
+    $input = json_decode(file_get_contents('php://input') ?: '', true);
+    $pdo = App\Database::connect();
+    $stmt = $pdo->prepare('INSERT INTO ingresos (upload_id, codigo, imputacion, presupuesto, recaudado_fecha_1, recaudado_fecha_2, total, porcentaje_rc) VALUES (0, ?, ?, ?, ?, ?, ?, ?)');
+    $stmt->execute([
+        (string) ($input['codigo'] ?? ''),
+        (string) ($input['imputacion'] ?? ''),
+        (float) ($input['presupuesto'] ?? 0),
+        (float) ($input['recaudado_fecha_1'] ?? 0),
+        (float) ($input['recaudado_fecha_2'] ?? 0),
+        (float) ($input['total'] ?? 0),
+        isset($input['porcentaje_rc']) ? (float) $input['porcentaje_rc'] : null,
+    ]);
+    echo json_encode(['status' => 'ok', 'id' => (int) $pdo->lastInsertId()], JSON_THROW_ON_ERROR);
+})());
+
+$router->put('/tasas', fn () => (function () {
+    header('Content-Type: application/json');
+    $auth = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+    $token = str_replace('Bearer ', '', $auth);
+    $payload = App\Auth::verify($token);
+    if (!is_array($payload) || ($payload['role'] ?? '') !== 'administrador') {
+        http_response_code(403);
+        echo json_encode(['error' => 'Sin permiso'], JSON_THROW_ON_ERROR);
+        return;
+    }
+    $input = json_decode(file_get_contents('php://input') ?: '', true);
+    $codigo = (string) ($input['codigo'] ?? '');
+    $pdo = App\Database::connect();
+    $stmt = $pdo->prepare('UPDATE ingresos SET imputacion=?, presupuesto=?, recaudado_fecha_1=?, recaudado_fecha_2=?, total=?, porcentaje_rc=? WHERE codigo=?');
+    $stmt->execute([
+        (string) ($input['imputacion'] ?? ''),
+        (float) ($input['presupuesto'] ?? 0),
+        (float) ($input['recaudado_fecha_1'] ?? 0),
+        (float) ($input['recaudado_fecha_2'] ?? 0),
+        (float) ($input['total'] ?? 0),
+        isset($input['porcentaje_rc']) ? (float) $input['porcentaje_rc'] : null,
+        $codigo,
+    ]);
+    echo json_encode(['status' => 'ok', 'affected' => $stmt->rowCount()], JSON_THROW_ON_ERROR);
+})());
+
+$router->delete('/tasas', fn () => (function () {
+    header('Content-Type: application/json');
+    $auth = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+    $token = str_replace('Bearer ', '', $auth);
+    $payload = App\Auth::verify($token);
+    if (!is_array($payload) || ($payload['role'] ?? '') !== 'administrador') {
+        http_response_code(403);
+        echo json_encode(['error' => 'Sin permiso'], JSON_THROW_ON_ERROR);
+        return;
+    }
+    $codigo = $_GET['codigo'] ?? '';
+    $pdo = App\Database::connect();
+    $stmt = $pdo->prepare('DELETE FROM ingresos WHERE codigo = ?');
+    $stmt->execute([$codigo]);
+    echo json_encode(['status' => 'ok', 'deleted' => $stmt->rowCount()], JSON_THROW_ON_ERROR);
+})());
+
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $router->dispatch($method, $path);

@@ -92,4 +92,19 @@ export class ApiService {
   conceptos() {
     return this.http.get<{ items: Array<{ codigo: string; imputacion: string; origen: string }> }>(`${this.baseUrl}/dashboard/conceptos`);
   }
+
+  createTasa(data: any) {
+    const token = localStorage.getItem('token') || '';
+    return this.http.post<{ status: string; id: number }>(`${this.baseUrl}/tasas`, data, { headers: { Authorization: `Bearer ${token}` } });
+  }
+
+  updateTasa(data: any) {
+    const token = localStorage.getItem('token') || '';
+    return this.http.put<{ status: string; affected: number }>(`${this.baseUrl}/tasas`, data, { headers: { Authorization: `Bearer ${token}` } });
+  }
+
+  deleteTasa(codigo: string) {
+    const token = localStorage.getItem('token') || '';
+    return this.http.delete<{ status: string; deleted: number }>(`${this.baseUrl}/tasas?codigo=${encodeURIComponent(codigo)}`, { headers: { Authorization: `Bearer ${token}` } });
+  }
 }

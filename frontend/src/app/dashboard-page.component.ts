@@ -68,6 +68,19 @@ import { NgIcon } from '@ng-icons/core';
             <button type="button" (click)="changePassword()">Cambiar clave</button>
             @if (passwordStatus()) { <p>{{ passwordStatus() }}</p> }
           </div>
+          <div class="admin-section">
+            <h4>Alta de Tasa</h4>
+            <input [value]="newCodigo()" (input)="newCodigo.set($any($event.target).value)" placeholder="Código" />
+            <input [value]="newImputacion()" (input)="newImputacion.set($any($event.target).value)" placeholder="Imputación" />
+            <input [value]="newTotal()" (input)="newTotal.set($any($event.target).value)" placeholder="Total" type="number" />
+            <button type="button" (click)="createTasa()">Crear Tasa</button>
+            @if (crudStatus()) { <p>{{ crudStatus() }}</p> }
+          </div>
+          <div class="admin-section">
+            <h4>Baja de Tasa</h4>
+            <input [value]="deleteCodigo()" (input)="deleteCodigo.set($any($event.target).value)" placeholder="Código a eliminar" />
+            <button type="button" (click)="deleteTasa()" class="btn-danger">Eliminar Tasa</button>
+          </div>
         </div>
       }
     </section>
@@ -87,6 +100,7 @@ import { NgIcon } from '@ng-icons/core';
     .user-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
     .role-badge { background: var(--color-primary); color: white; padding: 2px 10px; border-radius: 12px; font-size: 12px; }
     .btn-logout { background: var(--color-error); padding: 4px 12px; font-size: 12px; }
+    .btn-danger { background: var(--color-error); }
     .admin-panel { background: var(--color-bg); border-radius: var(--radius); padding: 12px; margin: 12px 0; border: 1px solid var(--color-border); }
     .cascada-section { margin-top: 16px; padding: 12px; background: var(--color-surface); border-radius: var(--radius); box-shadow: var(--shadow); }
     .cascada-input { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
@@ -112,6 +126,11 @@ export class DashboardPageComponent implements OnInit {
   error = signal('');
   uploadStatus = signal('');
   passwordStatus = signal('');
+  crudStatus = signal('');
+  newCodigo = signal('');
+  newImputacion = signal('');
+  newTotal = signal('');
+  deleteCodigo = signal('');
   newPassword = signal('nueva123');
   data = signal<{ rows: number; total: number; origenes: Record<string, number>; ejes: Record<string, number>; secretarias: Record<string, number>; subsecretarias: Record<string, number>; direcciones: Record<string, number>; concurrentes: Record<string, number> } | null>(null);
   ampliaciones = signal<Array<{ codigo: string; concepto: string; tipo: string; valor: number }>>([]);
@@ -148,6 +167,20 @@ export class DashboardPageComponent implements OnInit {
     this.api.concepto(code).subscribe({
       next: (res) => this.conceptoResult.set(res),
       error: () => this.conceptoResult.set({ error: 'No encontrado' })
+    });
+  }
+
+  createTasa() {
+    this.api.createTasa({ codigo: this.newCodigo(), imputacion: this.newImputacion(), total: +this.newTotal() }).subscribe({
+      next: () => { this.crudStatus.set('Tasa creada'); this.load(); },
+      error: () => this.crudStatus.set('Error al crear')
+    });
+  }
+
+  deleteTasa() {
+    this.api.deleteTasa(this.deleteCodigo()).subscribe({
+      next: () => { this.crudStatus.set('Tasa eliminada'); this.load(); },
+      error: () => this.crudStatus.set('Error al eliminar')
     });
   }
 

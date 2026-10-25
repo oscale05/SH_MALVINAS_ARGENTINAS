@@ -259,9 +259,11 @@ $router->get('/dashboard/eje', fn () => (function () {
 $router->get('/dashboard/secretaria', fn () => (function () {
     header('Content-Type: application/json');
     $pdo = App\Database::connect();
-    $stmt = $pdo->query('SELECT COUNT(*) AS rows_count FROM ingresos');
+    $ejeId = (int) ($_GET['eje_id'] ?? 0);
+    $where = $ejeId > 0 ? ' WHERE i.eje_id = ' . $ejeId : '';
+    $stmt = $pdo->query('SELECT COUNT(*) AS rows_count FROM ingresos' . $where);
     $rows = (int) $stmt->fetchColumn();
-    $stmt = $pdo->query("SELECT COALESCE(s.nombre, 'SIN SECRETARIA') AS secretaria, SUM(i.total) AS total FROM ingresos i LEFT JOIN secretarias s ON s.id = i.secretaria_id GROUP BY secretaria");
+    $stmt = $pdo->query("SELECT COALESCE(s.nombre, 'SIN SECRETARIA') AS secretaria, SUM(i.total) AS total FROM ingresos i LEFT JOIN secretarias s ON s.id = i.secretaria_id" . $where . " GROUP BY secretaria");
     $totals = [];
     foreach ($stmt->fetchAll() as $row) {
         $totals[$row['secretaria']] = (float) $row['total'];
@@ -288,9 +290,11 @@ $router->get('/dashboard/resumen', fn () => (function () {
 $router->get('/dashboard/subsecretaria', fn () => (function () {
     header('Content-Type: application/json');
     $pdo = App\Database::connect();
-    $stmt = $pdo->query('SELECT COUNT(*) AS rows_count FROM ingresos');
+    $secretariaId = (int) ($_GET['secretaria_id'] ?? 0);
+    $where = $secretariaId > 0 ? ' WHERE i.secretaria_id = ' . $secretariaId : '';
+    $stmt = $pdo->query('SELECT COUNT(*) AS rows_count FROM ingresos' . $where);
     $rows = (int) $stmt->fetchColumn();
-    $stmt = $pdo->query("SELECT COALESCE(s.nombre, 'SIN SUBSECRETARIA') AS subsecretaria, SUM(i.total) AS total FROM ingresos i LEFT JOIN subsecretarias s ON s.id = i.subsecretaria_id GROUP BY subsecretaria");
+    $stmt = $pdo->query("SELECT COALESCE(s.nombre, 'SIN SUBSECRETARIA') AS subsecretaria, SUM(i.total) AS total FROM ingresos i LEFT JOIN subsecretarias s ON s.id = i.subsecretaria_id" . $where . " GROUP BY subsecretaria");
     $totals = [];
     foreach ($stmt->fetchAll() as $row) {
         $totals[$row['subsecretaria']] = (float) $row['total'];
@@ -301,9 +305,11 @@ $router->get('/dashboard/subsecretaria', fn () => (function () {
 $router->get('/dashboard/direccion', fn () => (function () {
     header('Content-Type: application/json');
     $pdo = App\Database::connect();
-    $stmt = $pdo->query('SELECT COUNT(*) AS rows_count FROM ingresos');
+    $subsecretariaId = (int) ($_GET['subsecretaria_id'] ?? 0);
+    $where = $subsecretariaId > 0 ? ' WHERE i.subsecretaria_id = ' . $subsecretariaId : '';
+    $stmt = $pdo->query('SELECT COUNT(*) AS rows_count FROM ingresos' . $where);
     $rows = (int) $stmt->fetchColumn();
-    $stmt = $pdo->query("SELECT COALESCE(d.nombre, 'SIN DIRECCION') AS direccion, SUM(i.total) AS total FROM ingresos i LEFT JOIN direcciones d ON d.id = i.direccion_id GROUP BY direccion");
+    $stmt = $pdo->query("SELECT COALESCE(d.nombre, 'SIN DIRECCION') AS direccion, SUM(i.total) AS total FROM ingresos i LEFT JOIN direcciones d ON d.id = i.direccion_id" . $where . " GROUP BY direccion");
     $totals = [];
     foreach ($stmt->fetchAll() as $row) {
         $totals[$row['direccion']] = (float) $row['total'];

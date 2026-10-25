@@ -30,20 +30,23 @@ export class ApiService {
     return this.http.get<{ rows: number; totals_by_origin: Record<string, number> }>(`${this.baseUrl}/dashboard/macro${q}`);
   }
 
-  subsecretaria() {
-    return this.http.get<{ rows: number; totals_by_subsecretaria: Record<string, number> }>(`${this.baseUrl}/dashboard/subsecretaria`);
+  subsecretaria(secretariaId?: number) {
+    const q = secretariaId ? `?secretaria_id=${secretariaId}` : '';
+    return this.http.get<{ rows: number; totals_by_subsecretaria: Record<string, number> }>(`${this.baseUrl}/dashboard/subsecretaria${q}`);
   }
 
-  direccion() {
-    return this.http.get<{ rows: number; totals_by_direccion: Record<string, number> }>(`${this.baseUrl}/dashboard/direccion`);
+  direccion(subsecretariaId?: number) {
+    const q = subsecretariaId ? `?subsecretaria_id=${subsecretariaId}` : '';
+    return this.http.get<{ rows: number; totals_by_direccion: Record<string, number> }>(`${this.baseUrl}/dashboard/direccion${q}`);
   }
 
   eje() {
     return this.http.get<{ rows: number; totals_by_eje: Record<string, number> }>(`${this.baseUrl}/dashboard/eje`);
   }
 
-  secretaria() {
-    return this.http.get<{ rows: number; totals_by_secretaria: Record<string, number> }>(`${this.baseUrl}/dashboard/secretaria`);
+  secretaria(ejeId?: number) {
+    const q = ejeId ? `?eje_id=${ejeId}` : '';
+    return this.http.get<{ rows: number; totals_by_secretaria: Record<string, number> }>(`${this.baseUrl}/dashboard/secretaria${q}`);
   }
 
   uploads() {

@@ -1,90 +1,95 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal } from "@angular/core";
+import { DecimalPipe } from "@angular/common";
 import { ApiService } from './services/api.service';
 
 @Component({
   selector: 'app-cascade',
+  imports: [DecimalPipe],
   template: `
     <section class="cascade">
-      <h2>Efecto Cascada</h2>
+      <h3>Efecto Cascada (Macro → Micro)</h3>
       <div class="cascade-level">
-        <h3>Nivel 1: Origen</h3>
+        <span class="level-label">Nivel 1: Origen</span>
         <div class="cascade-items">
           @for (item of origenes(); track item.key) {
-            <button type="button" class="cascade-btn" (click)="selectOrigen(item.key)">{{ item.key }}: {{ item.value }}</button>
+            <button type="button" class="cascade-btn" [class.active]="selectedOrigen() === item.key" (click)="selectOrigen(item.key)">{{ item.key }}: {{ item.value | number:'1.0-0' }}</button>
           }
+          @if (origenes().length === 0) { <p class="no-data">Sin datos</p> }
         </div>
       </div>
       @if (selectedOrigen()) {
         <div class="cascade-level">
-          <h3>Nivel 2: Eje ({{ selectedOrigen() }})</h3>
+          <span class="level-label">Nivel 2: Eje</span>
           <div class="cascade-items">
             @for (item of ejes(); track item.key) {
-              <button type="button" class="cascade-btn" (click)="selectEje(item.key)">{{ item.key }}: {{ item.value }}</button>
+              <button type="button" class="cascade-btn" [class.active]="selectedEje() === item.key" (click)="selectEje(item.key)">{{ item.key }}: {{ item.value | number:'1.0-0' }}</button>
             }
+            @if (ejes().length === 0) { <p class="no-data">Sin datos</p> }
           </div>
         </div>
       }
       @if (selectedEje()) {
         <div class="cascade-level">
-          <h3>Nivel 3: Secretaría ({{ selectedEje() }})</h3>
+          <span class="level-label">Nivel 3: Secretaría</span>
           <div class="cascade-items">
             @for (item of secretarias(); track item.key) {
-              <button type="button" class="cascade-btn" (click)="selectSecretaria(item.key)">{{ item.key }}: {{ item.value }}</button>
+              <button type="button" class="cascade-btn" [class.active]="selectedSecretaria() === item.key" (click)="selectSecretaria(item.key)">{{ item.key }}: {{ item.value | number:'1.0-0' }}</button>
             }
-            @if (secretarias().length === 0) { <p class="no-data">Sin datos de secretaría</p> }
+            @if (secretarias().length === 0) { <p class="no-data">Sin datos</p> }
           </div>
         </div>
       }
       @if (selectedSecretaria()) {
         <div class="cascade-level">
-          <h3>Nivel 4: Subsecretaría ({{ selectedSecretaria() }})</h3>
+          <span class="level-label">Nivel 4: Subsecretaría</span>
           <div class="cascade-items">
             @for (item of subsecretarias(); track item.key) {
-              <button type="button" class="cascade-btn" (click)="selectSubsecretaria(item.key)">{{ item.key }}: {{ item.value }}</button>
+              <button type="button" class="cascade-btn" [class.active]="selectedSubsecretaria() === item.key" (click)="selectSubsecretaria(item.key)">{{ item.key }}: {{ item.value | number:'1.0-0' }}</button>
             }
-            @if (subsecretarias().length === 0) { <p class="no-data">Sin datos de subsecretaría</p> }
+            @if (subsecretarias().length === 0) { <p class="no-data">Sin datos</p> }
           </div>
         </div>
       }
       @if (selectedSubsecretaria()) {
         <div class="cascade-level">
-          <h3>Nivel 5: Dirección ({{ selectedSubsecretaria() }})</h3>
+          <span class="level-label">Nivel 5: Dirección</span>
           <div class="cascade-items">
             @for (item of direcciones(); track item.key) {
-              <button type="button" class="cascade-btn" (click)="selectDireccion(item.key)">{{ item.key }}: {{ item.value }}</button>
+              <button type="button" class="cascade-btn" [class.active]="selectedDireccion() === item.key" (click)="selectDireccion(item.key)">{{ item.key }}: {{ item.value | number:'1.0-0' }}</button>
             }
-            @if (direcciones().length === 0) { <p class="no-data">Sin datos de dirección</p> }
+            @if (direcciones().length === 0) { <p class="no-data">Sin datos</p> }
           </div>
         </div>
       }
       @if (selectedDireccion()) {
         <div class="cascade-level">
-          <h3>Nivel 6: Concepto ({{ selectedDireccion() }})</h3>
-          <div class="cascade-items">
-            @for (item of conceptos(); track item.key) {
-              <button type="button" class="cascade-btn concepto" (click)="selectConcepto(item.key)">{{ item.key }}: {{ item.value }}</button>
-            }
-            @if (conceptos().length === 0) { <p class="no-data">Sin datos de concepto</p> }
+          <span class="level-label">Nivel 6: Concepto</span>
+          <div class="cascade-input">
+            <input [value]="conceptoCode()" (input)="conceptoCode.set($any($event.target).value)" placeholder="Código (ej: 1.1.4.01)" />
+            <button type="button" class="cascade-btn" (click)="lookupConcepto()">Buscar</button>
           </div>
-        </div>
-      }
-      @if (selectedConcepto()) {
-        <div class="cascade-detail">
-          <h3>Detalle: {{ selectedConcepto() }}</h3>
-          <p>Seleccionado: {{ selectedConcepto() }}</p>
+          @if (conceptoResult()) {
+            <div class="concepto-result">
+              <p><strong>{{ conceptoResult().codigo }}</strong> - {{ conceptoResult().imputacion }}</p>
+              <p>Presupuesto: {{ conceptoResult().presupuesto }} | Total: {{ conceptoResult().total }}</p>
+            </div>
+          }
         </div>
       }
     </section>
   `,
   styles: [`
-    .cascade { padding: 0; }
-    .cascade-level { margin: 12px 0; padding: 12px; background: var(--color-surface); border-radius: var(--radius); box-shadow: var(--shadow); }
-    .cascade-items { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-    .cascade-btn { background: var(--color-primary); color: white; border: none; padding: 6px 12px; border-radius: var(--radius); cursor: pointer; font-size: 13px; }
+    .cascade { padding: 12px; background: var(--color-surface); border-radius: var(--radius); box-shadow: var(--shadow); margin-top: 16px; }
+    .cascade-level { margin: 8px 0; }
+    .level-label { font-weight: 600; color: var(--color-primary); font-size: 14px; }
+    .cascade-items { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+    .cascade-btn { background: var(--color-primary); color: white; border: none; padding: 6px 12px; border-radius: var(--radius); cursor: pointer; font-size: 12px; transition: all 0.2s; }
     .cascade-btn:hover { background: var(--color-primary-dark); }
-    .cascade-btn.concepto { background: var(--color-secondary); }
-    .cascade-detail { margin-top: 12px; padding: 12px; background: var(--color-bg); border-radius: var(--radius); }
-    .no-data { color: var(--color-text-muted); font-style: italic; font-size: 13px; }
+    .cascade-btn.active { background: var(--color-secondary); }
+    .cascade-input { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
+    .cascade-input input { flex: 1; max-width: none; min-width: 150px; }
+    .concepto-result { margin-top: 8px; padding: 8px; background: var(--color-bg); border-radius: var(--radius); }
+    .no-data { color: var(--color-text-muted); font-style: italic; font-size: 13px; margin: 4px 0; }
   `]
 })
 export class CascadeComponent {
@@ -94,7 +99,6 @@ export class CascadeComponent {
   secretarias = signal<{ key: string; value: number }[]>([]);
   subsecretarias = signal<{ key: string; value: number }[]>([]);
   direcciones = signal<{ key: string; value: number }[]>([]);
-  conceptos = signal<{ key: string; value: number }[]>([]);
 
   selectedOrigen = signal<string | null>(null);
   selectedEje = signal<string | null>(null);
@@ -102,6 +106,8 @@ export class CascadeComponent {
   selectedSubsecretaria = signal<string | null>(null);
   selectedDireccion = signal<string | null>(null);
   selectedConcepto = signal<string | null>(null);
+  conceptoCode = signal('');
+  conceptoResult = signal<any>(null);
 
   constructor() {
     this.api.macro().subscribe({
@@ -119,6 +125,10 @@ export class CascadeComponent {
     this.selectedSubsecretaria.set(null);
     this.selectedDireccion.set(null);
     this.selectedConcepto.set(null);
+    this.ejes.set([]);
+    this.secretarias.set([]);
+    this.subsecretarias.set([]);
+    this.direcciones.set([]);
     this.api.eje().subscribe({
       next: (res) => {
         this.ejes.set(Object.entries(res.totals_by_eje).map(([k, v]) => ({ key: k, value: v })));
@@ -133,6 +143,9 @@ export class CascadeComponent {
     this.selectedSubsecretaria.set(null);
     this.selectedDireccion.set(null);
     this.selectedConcepto.set(null);
+    this.secretarias.set([]);
+    this.subsecretarias.set([]);
+    this.direcciones.set([]);
     this.api.secretaria().subscribe({
       next: (res) => {
         this.secretarias.set(Object.entries(res.totals_by_secretaria).map(([k, v]) => ({ key: k, value: v })));
@@ -146,6 +159,8 @@ export class CascadeComponent {
     this.selectedSubsecretaria.set(null);
     this.selectedDireccion.set(null);
     this.selectedConcepto.set(null);
+    this.subsecretarias.set([]);
+    this.direcciones.set([]);
     this.api.subsecretaria().subscribe({
       next: (res) => {
         this.subsecretarias.set(Object.entries(res.totals_by_subsecretaria).map(([k, v]) => ({ key: k, value: v })));
@@ -158,6 +173,7 @@ export class CascadeComponent {
     this.selectedSubsecretaria.set(key);
     this.selectedDireccion.set(null);
     this.selectedConcepto.set(null);
+    this.direcciones.set([]);
     this.api.direccion().subscribe({
       next: (res) => {
         this.direcciones.set(Object.entries(res.totals_by_direccion).map(([k, v]) => ({ key: k, value: v })));
@@ -169,11 +185,14 @@ export class CascadeComponent {
   selectDireccion(key: string) {
     this.selectedDireccion.set(key);
     this.selectedConcepto.set(null);
-    // For conceptos, we'd need a specific endpoint; for now show the concepto lookup
-    this.conceptos.set([]);
   }
 
-  selectConcepto(key: string) {
-    this.selectedConcepto.set(key);
+  lookupConcepto() {
+    const code = this.conceptoCode();
+    if (!code) return;
+    this.api.concepto(code).subscribe({
+      next: (res) => this.conceptoResult.set(res),
+      error: () => this.conceptoResult.set({ error: 'No encontrado' })
+    });
   }
 }
